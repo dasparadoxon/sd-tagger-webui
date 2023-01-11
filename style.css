@@ -1,0 +1,8 @@
+.draggable {
+    cursor: move;
+    user-select: none;
+}
+
+.d-none {
+    display: none;
+}
