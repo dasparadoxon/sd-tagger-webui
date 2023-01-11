@@ -1,4 +1,4 @@
-# Stable Diffusion WebUI Tagger
+# Stable Diffusion WebUI Tagger (WIP)
 
 ## This is untested and might be very buggy
 
