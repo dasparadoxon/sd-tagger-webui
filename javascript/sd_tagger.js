@@ -25,6 +25,15 @@ let onPageLoad = () => {
     let dt = gradioApp().querySelector("#display_tags textarea");
     let st = gradioApp().querySelector("#save_tags");
     let ts = gradioApp().querySelector("#tag_search");
+    let tic = gradioApp().querySelector("#tagging_image");
+    let ti = gradioApp().querySelector("#tagging_image img");
+
+    // Format Tagging Image (Display)
+    tic.style.maxHeight = "500px";
+    ti.style.maxHeight = "500px";
+    ti.style.margin = "auto";
+    ti.classList.remove("w-full");
+    ti.classList.add("h-full");
 
     // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
     let reloadTags = () => {
