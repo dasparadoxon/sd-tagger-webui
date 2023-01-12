@@ -1,24 +1,33 @@
+/// TODO Proper naming
+let tg = gradioApp().querySelector("#tag_list");
+let tgli = gradioApp().querySelector("#tag_list_inner");
+let tb = gradioApp().querySelector("#example_tag");
+let td = gradioApp().querySelector("#tags_data textarea");
+let dt = gradioApp().querySelector("#display_tags textarea");
+let st = gradioApp().querySelector("#save_tags");
+let ts = gradioApp().querySelector("#tag_search");
+
+let observeProperty = (obj, property, callback, time = 250, compare) => {
+    let initial = obj[property];
+    setInterval(() => {
+        let now = obj[property];
+        if(compare) {
+            if(compare(initial, now)) {
+                callback(now);
+            }
+        } else {
+            if(initial !== now) {
+                callback(now);
+            }
+        }
+    }, time);
+}
+
 let onPageLoad = () => {
-    let tg = gradioApp().querySelector("#tag_list");
-    let tgli = gradioApp().querySelector("#tag_list_inner");
-    let tb = gradioApp().querySelector("#example_tag");
-    let td = gradioApp().querySelector("#tags_data textarea");
-    let dt = gradioApp().querySelector("#display_tags textarea");
-    let st = gradioApp().querySelector("#save_tags");
-    let ts = gradioApp().querySelector("#tag_search");
 
-    let on = (button) => {
-        if(!button.classList.contains("gr-button-primary"))
-            button.classList.add("gr-button-primary");
-    }
 
-    let off = (button) => {
-        button.classList.remove("gr-button-primary");
-    }
-
-    let refreshTags = () => {
-        console.log("Refresh Tags...");
-        
+    // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
+    let reloadTags = () => {
         if(!td.value)
             return;
 
@@ -54,7 +63,8 @@ let onPageLoad = () => {
         }
     }
 
-    let readTags = () => {
+    // Update the tag states (e.g. switching images)
+    let updateTags = () => {
         split = dt.value.split(",").map((s) => {
             return s.trim();
         });
@@ -62,46 +72,39 @@ let onPageLoad = () => {
         let buttons = tgli.childNodes;
         for(let i = 0; i < buttons.length; i++) {
             if(split.includes(buttons[i].innerText))
-                on(buttons[i]);
+                if(!buttons[i].classList.contains("gr-button-primary"))
+                    buttons[i].classList.add("gr-button-primary");
             else
-                off(buttons[i]);
+                    buttons[i].classList.remove("gr-button-primary");
         }
     }
 
-    lastSearch = ts.value.toLowerCase();
-    setInterval(() => {
-        if(lastSearch != ts.value.toLowerCase()) {
-            text = ts.value.toLowerCase();
-            let buttons = tgli.childNodes;
-            for(let i = 0; i < buttons.length; i++) {
-                if(buttons[i].innerText.toLowerCase().startsWith(text)) {
-                    buttons[i].style.display = "";
-                } else {
-                    buttons[i].style.display = "none";
-                }
-            }
-            lastSearch = text
-        }
-    }, 250);
 
-    lastText = td.value;
-    setInterval(() => {
-        if(lastText != td.value) {
-            refreshTags();
-            readTags();
-            lastText = td.value;
+    /// TODO Try to replace these with event calling
+
+    observeProperty(ts, "value", (text) => {
+        let buttons = tgli.childNodes;
+        for(let i = 0; i < buttons.length; i++) {
+            if(buttons[i].innerText.toLowerCase().startsWith(text)) {
+                buttons[i].style.display = "";
+            } else {
+                buttons[i].style.display = "none";
+            }
         }
+    });
+
+    observeProperty(td, "value", () => {
+        reloadTags();
+        updateTags();
     }, 1000);
 
-    lastTextDisplayTags = dt.value;
-    setInterval(() => {
-        if(lastTextDisplayTags != dt.value) {
-            readTags();
-            lastTextDisplayTags = dt.value;
-        }
+    observeProperty(dt, "value", () => {
+        updateTags();
     }, 250);
 }
 
+
+/// TODO Messy
 let interval = setInterval(() => {
     let tg = gradioApp().querySelector("#tag_list");
     if(tg) {
