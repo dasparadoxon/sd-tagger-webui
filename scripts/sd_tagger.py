@@ -1,15 +1,33 @@
 import os
+import json
 import gradio as gr
 from scripts.helpers.tagger import Tagger
 from modules import script_callbacks, sd_models
 
-# Import HTML
-with open('extensions/sd-tagger-webui/tag_list.html', 'r') as f:
-    html_string = f.read()
-
 
 # Globals
 tagger = None
+config = {
+    "dataset_path": "",
+    "tags_path": ""
+}
+
+config_file = "extensions/sd-tagger-webui/config.json"
+html_file = "extensions/sd-tagger-webui/tag_list.html"
+
+# Import HTML
+with open(html_file, "r") as f:
+    html_string = f.read()
+
+# Import Config
+if os.path.isfile(config_file):
+    with open(config_file, "r") as f:
+        config = json.load(f)
+
+
+def save_config():
+    with open(config_file, "w") as f:
+        json.dump(config, f)
 
 
 def on_ui_tabs():
@@ -20,7 +38,7 @@ def on_ui_tabs():
         with log_row:
             log_output = gr.HTML(value="")
         with gr.Row():
-            dataset_textbox = gr.Text(value="", label="Path to Dataset")
+            dataset_textbox = gr.Text(value=config["dataset_path"], label="Path to Dataset")
             process_button = gr.Button(value="Process", variant="primary")
         with gr.Row():
             with gr.Column(variant="panel"):
@@ -29,7 +47,7 @@ def on_ui_tabs():
                     with gr.Column():
                         gr.HTML(elem_id="tag_list", value=html_string)
                 with gr.Row(variant="panel"):
-                    tags_textbox = gr.Text(value="", label="Path to Tags")
+                    tags_textbox = gr.Text(value=config["tags_path"], label="Path to Tags")
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
             with gr.Column():
                 display = gr.Image(interactive=False, elem_id="tagging_image", show_label=True)
@@ -56,6 +74,8 @@ def on_ui_tabs():
                 return gr.update(visible=True), f"Error: Invalid Tags Path", None
             with open(path, 'r') as f:
                 tags = list(dict.fromkeys([line.rstrip() for line in f]))
+            config["tags_path"] = path
+            save_config()
             return gr.update(visible=True), f"Successfully imported {len(tags)} tags from {path}", tags
 
         def process_click(path):
@@ -63,8 +83,9 @@ def on_ui_tabs():
                 return gr.update(visible=True), f"Error: Invalid Dataset Path", None
             global tagger
             tagger = Tagger(path)
-            return gr.update(
-                visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path
+            config["dataset_path"] = path
+            save_config()
+            return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path
 
         def previous_click():
             if tagger:
@@ -77,8 +98,7 @@ def on_ui_tabs():
             return gr.update(value=tagger.index)
 
         def display_update():
-            return ", ".join(tagger.current().tags), f"{tagger.index} / {tagger.num_files}", gr.update(
-                value=tagger.index, maximum=tagger.num_files, visible=True, interactive=True)
+            return ", ".join(tagger.current().tags), f"{tagger.index} / {tagger.num_files}", gr.update(value=tagger.index, maximum=tagger.num_files, visible=True, interactive=True)
 
         def index_update(index):
             tagger.set(index)
