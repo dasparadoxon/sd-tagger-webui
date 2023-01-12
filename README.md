@@ -6,11 +6,11 @@ This is a small extension for AUTOMATIC's webui. It adds a tab for tagging image
 
 ![Screenshot of user interface](screenshot.png)
 
-##Getting Started
+## Getting Started
 
 Just install the extension through the extensions tab or git clone into your extensions folder.
 
-##Usage
+## Usage
 
 ### Dataset
 
