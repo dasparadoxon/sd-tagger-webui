@@ -46,9 +46,10 @@ def on_ui_tabs():
 
         # Component actions
         def save_tags_click(text):
-            tagger.current().tags = [x.strip() for x in text.split(',')]
-            tagger.current().save()
-            print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
+            if tagger:
+                tagger.current().tags = [x.strip() for x in text.split(',')]
+                tagger.current().save()
+                print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
 
         def load_tags_click(path):
             if not os.path.isfile(path):
@@ -66,11 +67,13 @@ def on_ui_tabs():
                 visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path
 
         def previous_click():
-            tagger.previous()
+            if tagger:
+                tagger.previous()
             return gr.update(value=tagger.index)
 
         def next_click():
-            tagger.next()
+            if tagger:
+                tagger.next()
             return gr.update(value=tagger.index)
 
         def display_update():
