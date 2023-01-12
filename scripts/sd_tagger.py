@@ -21,7 +21,6 @@ def on_ui_tabs():
 				display_tags = gr.TextArea(elem_id="display_tags", value="", interactive=True)
 				with gr.Row(variant="panel"):
 					with gr.Column():
-						gr.HTML("Available Tags")
 						gr.HTML(elem_id="tag_list", value=html_string)
 				with gr.Row(variant="panel"):
 					tags_textbox = gr.Text(value="", label="Path to Tags")

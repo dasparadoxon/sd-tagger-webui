@@ -26,6 +26,7 @@ let onPageLoad = () => {
     let td = gradioApp().querySelector("#tags_data textarea");
     let dt = gradioApp().querySelector("#display_tags textarea");
     let st = gradioApp().querySelector("#save_tags");
+    let ts = gradioApp().querySelector("#tag_search");
 
     let on = (button) => {
         if(!button.classList.contains("gr-button-primary"))
@@ -38,15 +39,17 @@ let onPageLoad = () => {
 
     let refreshTags = () => {
         console.log("Refresh Tags...");
-
+        
         if(!td.value)
             return;
 
-        tgli.innerHTML = "";
+        ts.value = ""; // Reset Search
+        tgli.innerHTML = ""; // Remove Buttons
 
         tags = JSON.parse(td.value.replaceAll("\'", "\""));
         for (let i = 0; i < tags.length; i++) {
             let tagButton = tb.cloneNode(true);
+            tagButton.id = "";
             tagButton.innerText = tags[i];
             tagButton.onclick = () => {
                 if (tagButton.classList.contains("gr-button-primary")) {
@@ -85,6 +88,22 @@ let onPageLoad = () => {
                 off(buttons[i]);
         }
     }
+
+    lastSearch = ts.value.toLowerCase();
+    setInterval(() => {
+        if(lastSearch != ts.value.toLowerCase()) {
+            text = ts.value.toLowerCase();
+            let buttons = tgli.childNodes;
+            for(let i = 0; i < buttons.length; i++) {
+                if(buttons[i].innerText.toLowerCase().startsWith(text)) {
+                    buttons[i].style.display = "";
+                } else {
+                    buttons[i].style.display = "none";
+                }
+            }
+            lastSearch = text
+        }
+    }, 250);
 
     lastText = td.value;
     setInterval(() => {
