@@ -63,19 +63,36 @@ let onPageLoad = () => {
         croppingRect.onmouseup = mouseup;
     }
 
-    let cropperUpdate = (x, y) => {
+    let cropperUpdate = (mouseX, mouseY) => {
         let bound = gradioApp().querySelector("#display div").getBoundingClientRect();
-        let croppingRect = gradioApp().querySelector("#cropping_rect");
+        let rect = gradioApp().querySelector("#cropping_rect");
+
+        rect.style.display = ti.pressed ? "block" : "none";
+        //croppingRect.style.display = ti.hovering ? "block" : "none"; // Another mode
 
         if(ti.pressed) {
-            croppingRect.style.width = x - ti.press_x + "px";
-            croppingRect.style.height = y - ti.press_y + "px";
-            croppingRect.style.left = ti.press_x - bound.x + "px";
-            croppingRect.style.top = ti.press_y - bound.y + "px";
-        }
+            let x = ti.press_x - bound.x;
+            let y = ti.press_y - bound.y
+            let width = mouseX - ti.press_x;
+            let height = mouseY - ti.press_y;
 
-        croppingRect.style.display = ti.pressed ? "block" : "none";
-        //croppingRect.style.display = ti.hovering ? "block" : "none"; // Another mode
+            // Chunking
+            width = Math.round(width / 64) * 64;
+            height = Math.round(height / 64) * 64;
+
+            let endX = x + width;
+            let endY = y + height;
+
+            if (endX > bound.width)
+                width = width - (endX - bound.width)
+            if (endY > bound.height)
+                height = height - (endY - bound.height)
+
+            rect.style.left = x + "px";
+            rect.style.top = y + "px";
+            rect.style.width = width + "px";
+            rect.style.height = height + "px";
+        }
     }
 
     // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
