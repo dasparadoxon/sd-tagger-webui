@@ -1,6 +1,9 @@
 import os
 import json
 import gradio as gr
+import base64
+import random
+from PIL import Image
 from scripts.helpers.tagger import Tagger
 from modules import script_callbacks, sd_models
 
@@ -13,11 +16,15 @@ config = {
 }
 
 config_file = "extensions/sd-tagger-webui/config.json"
-html_file = "extensions/sd-tagger-webui/tag_list.html"
+
+tag_list_file = "extensions/sd-tagger-webui/html/tag_list.html"
+display_file = "extensions/sd-tagger-webui/html/display.html"
 
 # Import HTML
-with open(html_file, "r") as f:
-    html_string = f.read()
+with open(tag_list_file, "r") as f:
+    tag_list_html = f.read()
+with open(display_file, "r") as f:
+    display_html = f.read()
 
 # Import Config
 if os.path.isfile(config_file):
@@ -45,12 +52,13 @@ def on_ui_tabs():
                 display_tags = gr.TextArea(elem_id="display_tags", value="", interactive=True)
                 with gr.Row(variant="panel"):
                     with gr.Column():
-                        gr.HTML(elem_id="tag_list", value=html_string)
+                        gr.HTML(elem_id="tag_list", value=tag_list_html)
                 with gr.Row(variant="panel"):
                     tags_textbox = gr.Text(value=config["tags_path"], label="Path to Tags")
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
             with gr.Column():
-                display = gr.Image(interactive=False, elem_id="tagging_image", show_label=True)
+                gr.HTML(value=display_html)
+                display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image")
                 with gr.Row():
                     log_count = gr.HTML(value="")
                     display_index = gr.Slider(visible=False)
@@ -61,6 +69,8 @@ def on_ui_tabs():
         # Section used to transfer data between js and gradio
         tags_data = gr.Text(elem_id="tags_data", visible=False)
         save_tags_button = gr.Button(elem_id="save_tags", visible=False)
+        crop_data = gr.Text(elem_id="crop_data", visible=False)
+        crop_button = gr.Button(elem_id="crop_button", visible=False)
 
         # Component actions
         def save_tags_click(text):
@@ -104,7 +114,22 @@ def on_ui_tabs():
             tagger.set(index)
             return tagger.current().path
 
+        def crop_click(image, crop_json):
+            if not os.path.isdir("extensions/sd-tagger-webui/crops"):
+                os.mkdir("extensions/sd-tagger-webui/crops")
+            rect = json.loads(crop_json)
+            rect = (rect["x1"], rect["y1"], rect["x2"], rect["y2"])
+            try:
+                crop_image = Image.fromarray(image).crop(rect)
+                w, h = crop_image.size
+                crop_name = str(tagger.index) + "-(" + str(w) + "x" + str(h) + ")-" + str(random.randint(0, 100000)) + ".png"
+                crop_image.save("extensions/sd-tagger-webui/crops/" + crop_name)
+                print("Cropped", tagger.index, crop_json, "Saved To:", crop_name)
+            except Exception as err:
+                print("Error while cropping: ", err)
+
         # Events
+        crop_button.click(fn=crop_click, inputs=[display, crop_data])
         save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
         load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, tags_data])
         process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display])
