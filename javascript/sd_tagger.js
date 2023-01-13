@@ -46,7 +46,7 @@ let onPageLoad = () => {
         }
 
         let mouseup = (e) => {
-            if(e.button === 1) {
+            if(e.button === 0) {
                 cancel();
 
                 // Send for Crop
