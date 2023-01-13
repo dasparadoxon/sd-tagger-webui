@@ -20,6 +20,13 @@ let onPageLoad = () => {
     let crop = {};
 
     let initCropper = () => {
+
+        let cancel = () => {
+            ti.pressed = false;
+            ti.press_x = undefined;
+            ti.press_y = undefined;
+        }
+
         let mousemove = (e) => {
             cropperUpdate(e.pageX, e.pageY);
             e.preventDefault();
@@ -29,19 +36,24 @@ let onPageLoad = () => {
             ti.pressed = true;
             ti.press_x = e.pageX;
             ti.press_y = e.pageY;
+
+            // Cancel Crop
+            if(e.button === 2) {
+                cancel();
+            }
+
             e.preventDefault();
         }
 
         let mouseup = (e) => {
-            ti.pressed = false;
-            ti.press_x = undefined;
-            ti.press_y = undefined;
+            if(e.button === 1) {
+                cancel();
 
-            // Send for Crop
-            cd.value = JSON.stringify(crop);
-            cd.dispatchEvent(new CustomEvent("input", {}));
-            cb.click();
-
+                // Send for Crop
+                cd.value = JSON.stringify(crop);
+                cd.dispatchEvent(new CustomEvent("input", {}));
+                cb.click();
+            }
             e.preventDefault();
         }
 
@@ -54,19 +66,19 @@ let onPageLoad = () => {
         ti.onmouseleave = (e) => {
             ti.hovering = false;
 
-            // Rect is fucking this up
-            /*ti.pressed = false;
-            ti.press_x = undefined;
-            ti.press_y = undefined;
-            console.log("Up");
-            e.preventDefault();*/
+            // Look into alternatives. (Allow holding crop when out of frame)
+            //cancel(); // Can't do this, because mouse hovers over rect and triggers this
+            // when trying to crop.
         }
+
+        ti.oncontextmenu = () => {return false};
 
         let croppingRect = gradioApp().querySelector("#cropping_rect");
 
         croppingRect.onmousemove = mousemove;
         croppingRect.onmousedown = mousedown;
         croppingRect.onmouseup = mouseup;
+        croppingRect.oncontextmenu = () => {return false};
     }
 
     let cropperUpdate = (mouseX, mouseY) => {
@@ -109,8 +121,6 @@ let onPageLoad = () => {
                 x2: Math.floor((x + width) * sizeRatio),
                 y2: Math.floor((y + height) * sizeRatio)
             };
-
-            console.log(crop);
         }
     }
 
