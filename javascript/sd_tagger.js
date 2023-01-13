@@ -47,12 +47,13 @@ let onPageLoad = () => {
 
         let mouseup = (e) => {
             if(e.button === 0) {
+                if(ti.pressed) {
+                    // Send for Crop
+                    cd.value = JSON.stringify(crop);
+                    cd.dispatchEvent(new CustomEvent("input", {}));
+                    cb.click();
+                }
                 cancel();
-
-                // Send for Crop
-                cd.value = JSON.stringify(crop);
-                cd.dispatchEvent(new CustomEvent("input", {}));
-                cb.click();
             }
             e.preventDefault();
         }
@@ -204,12 +205,17 @@ let onPageLoad = () => {
     let postImageLoad = setInterval(() => {
         ti = gradioApp().querySelector("#tagging_image img");
         if(ti) {
+            let display_inner = gradioApp().querySelector("#display div");
+            let display = gradioApp().querySelector("#display");
+            let old_html = gradioApp().querySelector("#tagging_image");
 
-            let display = gradioApp().querySelector("#display div");
-            display.appendChild(ti);
+            old_html.style.position = "absolute";
+            old_html.style.top = "100%";
+
+            display_inner.appendChild(ti);
+            display.appendChild(old_html);
 
             // Format Tagging Image
-            ti.style.maxHeight = "500px";
             ti.classList.remove("w-full");
             ti.classList.add("h-full");
             ti.classList.add("tagging-img");
