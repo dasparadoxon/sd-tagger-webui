@@ -64,24 +64,14 @@ let onPageLoad = () => {
     }
 
     let cropperUpdate = (x, y) => {
-        let bound = ti.getBoundingClientRect();
+        let bound = gradioApp().querySelector("#display div").getBoundingClientRect();
         let croppingRect = gradioApp().querySelector("#cropping_rect");
 
         if(ti.pressed) {
-            let wid = ti.press_x - x;
-            let hig = ti.press_y - y;
-
-            console.log(ti.press_x + " " + ti.press_y + " || " + bound.x + " " + bound.y);
-
-            console.log(ti.style.marginLeft);
-
-            croppingRect.style.width = "10px";
-            croppingRect.style.height = "10px";
+            croppingRect.style.width = x - ti.press_x + "px";
+            croppingRect.style.height = y - ti.press_y + "px";
             croppingRect.style.left = ti.press_x - bound.x + "px";
             croppingRect.style.top = ti.press_y - bound.y + "px";
-
-            //croppingRect.style.left = (x - bound.x) + "px";
-            //croppingRect.style.top = (y - bound.y) + "px";
         }
 
         croppingRect.style.display = ti.pressed ? "block" : "none";

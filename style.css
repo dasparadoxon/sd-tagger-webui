@@ -17,6 +17,12 @@
     z-index: 999;
 }
 
+#crop_outer {
+    position: relative;
+    width: 0;
+    height: 0;
+}
+
 .tagging-img {
     -webkit-user-select: none;
     -webkit-user-drag: none;
