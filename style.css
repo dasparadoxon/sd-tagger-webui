@@ -7,6 +7,17 @@
     display: none;
 }
 
-.center-self {
-    align-self: center;
+.j-center {
+    justify-content: center;
+}
+
+#cropping_rect {
+    position: absolute;
+    border: 1px solid red;
+    z-index: 999;
+}
+
+.tagging-img {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
 }

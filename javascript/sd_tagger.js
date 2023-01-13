@@ -17,23 +17,76 @@ let observeProperty = (obj, property, callback, time = 250, compare) => {
 
 let onPageLoad = () => {
 
-    /// TODO Proper Naming
-    let tg = gradioApp().querySelector("#tag_list");
-    let tgli = gradioApp().querySelector("#tag_list_inner");
-    let tb = gradioApp().querySelector("#example_tag");
-    let td = gradioApp().querySelector("#tags_data textarea");
-    let dt = gradioApp().querySelector("#display_tags textarea");
-    let st = gradioApp().querySelector("#save_tags");
-    let ts = gradioApp().querySelector("#tag_search");
-    let tic = gradioApp().querySelector("#tagging_image");
-    let ti = gradioApp().querySelector("#tagging_image img");
+    let initCropper = () => {
+        let mousemove = (e) => {
+            cropperUpdate(e.pageX, e.pageY);
+            e.preventDefault();
+        }
 
-    // Format Tagging Image (Display)
-    tic.style.maxHeight = "500px";
-    ti.style.maxHeight = "500px";
-    ti.style.margin = "auto";
-    ti.classList.remove("w-full");
-    ti.classList.add("h-full");
+        let mousedown = (e) => {
+            ti.pressed = true;
+            ti.press_x = e.pageX;
+            ti.press_y = e.pageY;
+            console.log("Down");
+            e.preventDefault();
+        }
+
+        let mouseup = (e) => {
+            ti.pressed = false;
+            ti.press_x = undefined;
+            ti.press_y = undefined;
+            console.log("Up");
+            e.preventDefault();
+        }
+
+        ti.onmousemove = mousemove;
+        ti.onmousedown = mousedown;
+        ti.onmouseup = mouseup;
+
+        ti.onmouseenter = (e) => {ti.hovering = true;}
+
+        ti.onmouseleave = (e) => {
+            ti.hovering = false;
+
+            // Rect is fucking this up
+            /*ti.pressed = false;
+            ti.press_x = undefined;
+            ti.press_y = undefined;
+            console.log("Up");
+            e.preventDefault();*/
+        }
+
+        let croppingRect = gradioApp().querySelector("#cropping_rect");
+
+        croppingRect.onmousemove = mousemove;
+        croppingRect.onmousedown = mousedown;
+        croppingRect.onmouseup = mouseup;
+    }
+
+    let cropperUpdate = (x, y) => {
+        let bound = ti.getBoundingClientRect();
+        let croppingRect = gradioApp().querySelector("#cropping_rect");
+
+        if(ti.pressed) {
+            let wid = ti.press_x - x;
+            let hig = ti.press_y - y;
+
+            console.log(ti.press_x + " " + ti.press_y + " || " + bound.x + " " + bound.y);
+
+            console.log(ti.style.marginLeft);
+
+            croppingRect.style.width = "10px";
+            croppingRect.style.height = "10px";
+            croppingRect.style.left = ti.press_x - bound.x + "px";
+            croppingRect.style.top = ti.press_y - bound.y + "px";
+
+            //croppingRect.style.left = (x - bound.x) + "px";
+            //croppingRect.style.top = (y - bound.y) + "px";
+        }
+
+        croppingRect.style.display = ti.pressed ? "block" : "none";
+        //croppingRect.style.display = ti.hovering ? "block" : "none"; // Another mode
+    }
 
     // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
     let reloadTags = () => {
@@ -78,7 +131,12 @@ let onPageLoad = () => {
             return s.trim();
         });
 
-        let buttons = tgli.childNodes;
+        let buttons = tgli.getElementsByTagName("button");
+
+        // Return if buttons not loaded
+        if(buttons.length === 0)
+            return;
+
         for(let i = 0; i < buttons.length; i++) {
             if(split.includes(buttons[i].innerText)) {
                 if (!buttons[i].classList.contains("gr-button-primary")) {
@@ -90,6 +148,40 @@ let onPageLoad = () => {
         }
     }
 
+    /// TODO Proper Naming
+    let tg = gradioApp().querySelector("#tag_list");
+    let tgli = gradioApp().querySelector("#tag_list_inner");
+    let tb = gradioApp().querySelector("#example_tag");
+    let td = gradioApp().querySelector("#tags_data textarea");
+    let dt = gradioApp().querySelector("#display_tags textarea");
+    let st = gradioApp().querySelector("#save_tags");
+    let ts = gradioApp().querySelector("#tag_search");
+    let tic = gradioApp().querySelector("#tagging_image");
+    let ti = gradioApp().querySelector("#tagging_image img");
+    let dd = gradioApp().querySelector("#display_data img");
+
+    // Format Tagging Image Container
+    tic.style.maxHeight = "500px";
+
+    let postImageLoad = setInterval(() => {
+        ti = gradioApp().querySelector("#tagging_image img");
+        if(ti) {
+
+            let display = gradioApp().querySelector("#display div");
+            display.appendChild(ti);
+
+            // Format Tagging Image
+            ti.style.maxHeight = "500px";
+            ti.classList.remove("w-full");
+            ti.classList.add("h-full");
+            ti.classList.add("tagging-img");
+
+            // Activate Image Cropper
+            initCropper();
+
+            clearInterval(postImageLoad);
+        }
+    }, 250);
 
     /// TODO Replace these with event calling
     observeProperty(ts, "value", (text) => {
@@ -101,7 +193,7 @@ let onPageLoad = () => {
                 buttons[i].style.display = "none";
             }
         }
-    });
+    }, 250);
 
     observeProperty(td, "value", () => {
         reloadTags();
@@ -111,6 +203,10 @@ let onPageLoad = () => {
     observeProperty(dt, "value", () => {
         updateTags();
     }, 250);
+
+    /*observeProperty(td, "value", () => {
+        ti.src = dd.src;
+    }, 250);*/
 }
 
 
