@@ -17,6 +17,8 @@ let observeProperty = (obj, property, callback, time = 250, compare) => {
 
 let onPageLoad = () => {
 
+    let crop = {};
+
     let initCropper = () => {
         let mousemove = (e) => {
             cropperUpdate(e.pageX, e.pageY);
@@ -27,7 +29,6 @@ let onPageLoad = () => {
             ti.pressed = true;
             ti.press_x = e.pageX;
             ti.press_y = e.pageY;
-            console.log("Down");
             e.preventDefault();
         }
 
@@ -35,7 +36,12 @@ let onPageLoad = () => {
             ti.pressed = false;
             ti.press_x = undefined;
             ti.press_y = undefined;
-            console.log("Up");
+
+            // Send for Crop
+            cd.value = JSON.stringify(crop);
+            cd.dispatchEvent(new CustomEvent("input", {}));
+            cb.click();
+
             e.preventDefault();
         }
 
@@ -77,8 +83,10 @@ let onPageLoad = () => {
             let height = mouseY - ti.press_y;
 
             // Chunking
-            width = Math.round(width / 64) * 64;
-            height = Math.round(height / 64) * 64;
+            let chunk = 64;
+
+            width = Math.round(width / chunk) * chunk;
+            height = Math.round(height / chunk) * chunk;
 
             let endX = x + width;
             let endY = y + height;
@@ -92,6 +100,17 @@ let onPageLoad = () => {
             rect.style.top = y + "px";
             rect.style.width = width + "px";
             rect.style.height = height + "px";
+
+            let sizeRatio = ti.naturalWidth / bound.width;
+
+            crop = {
+                x1: Math.floor(x * sizeRatio),
+                y1: Math.floor(y * sizeRatio),
+                x2: Math.floor((x + width) * sizeRatio),
+                y2: Math.floor((y + height) * sizeRatio)
+            };
+
+            console.log(crop);
         }
     }
 
@@ -166,6 +185,8 @@ let onPageLoad = () => {
     let tic = gradioApp().querySelector("#tagging_image");
     let ti = gradioApp().querySelector("#tagging_image img");
     let dd = gradioApp().querySelector("#display_data img");
+    let cd = gradioApp().querySelector("#crop_data textarea");
+    let cb = gradioApp().querySelector("#crop_button");
 
     // Format Tagging Image Container
     tic.style.maxHeight = "500px";

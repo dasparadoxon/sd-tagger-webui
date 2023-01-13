@@ -68,6 +68,8 @@ def on_ui_tabs():
         # Section used to transfer data between js and gradio
         tags_data = gr.Text(elem_id="tags_data", visible=False)
         save_tags_button = gr.Button(elem_id="save_tags", visible=False)
+        crop_data = gr.Text(elem_id="crop_data", visible=False)
+        crop_button = gr.Button(elem_id="crop_button", visible=False)
 
         # Component actions
         def save_tags_click(text):
@@ -111,7 +113,14 @@ def on_ui_tabs():
             tagger.set(index)
             return tagger.current().path
 
+        def crop_click(image, crop_json):
+            print(crop_json)
+            rect = json.loads(crop_json)
+            rect = (rect["x1"], rect["y1"], rect["x2"], rect["y2"])
+            Image.fromarray(image).crop(rect).save("extensions/sd-tagger-webui/cropped.png")
+
         # Events
+        crop_button.click(fn=crop_click, inputs=[display, crop_data])
         save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
         load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, tags_data])
         process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display])
