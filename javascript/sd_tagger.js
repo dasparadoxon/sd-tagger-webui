@@ -47,12 +47,13 @@ let onPageLoad = () => {
 
         let mouseup = (e) => {
             if(e.button === 0) {
+                if(ti.pressed) {
+                    // Send for Crop
+                    cd.value = JSON.stringify(crop);
+                    cd.dispatchEvent(new CustomEvent("input", {}));
+                    cb.click();
+                }
                 cancel();
-
-                // Send for Crop
-                cd.value = JSON.stringify(crop);
-                cd.dispatchEvent(new CustomEvent("input", {}));
-                cb.click();
             }
             e.preventDefault();
         }
@@ -204,9 +205,9 @@ let onPageLoad = () => {
     let postImageLoad = setInterval(() => {
         ti = gradioApp().querySelector("#tagging_image img");
         if(ti) {
-
             let display = gradioApp().querySelector("#display div");
             display.appendChild(ti);
+            gradioApp().querySelector("#tagging_image").style.display = "none"; // Hide unused html. TODO Test if we can just remove this
 
             // Format Tagging Image
             ti.style.maxHeight = "500px";
