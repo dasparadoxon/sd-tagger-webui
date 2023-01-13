@@ -2,6 +2,7 @@ import os
 import json
 import gradio as gr
 import base64
+import random
 from PIL import Image
 from scripts.helpers.tagger import Tagger
 from modules import script_callbacks, sd_models
@@ -114,10 +115,18 @@ def on_ui_tabs():
             return tagger.current().path
 
         def crop_click(image, crop_json):
-            print(crop_json)
+            if not os.path.isdir("extensions/sd-tagger-webui/crops"):
+                os.mkdir("extensions/sd-tagger-webui/crops")
             rect = json.loads(crop_json)
             rect = (rect["x1"], rect["y1"], rect["x2"], rect["y2"])
-            Image.fromarray(image).crop(rect).save("extensions/sd-tagger-webui/cropped.png")
+            try:
+                crop_image = Image.fromarray(image).crop(rect)
+                w, h = crop_image.size
+                crop_name = str(tagger.index) + "-(" + str(w) + "x" + str(h) + ")-" + str(random.randint(0, 100000)) + ".png"
+                crop_image.save("extensions/sd-tagger-webui/crops/" + crop_name)
+                print("Cropped", tagger.index, crop_json, "Saved To:", crop_name)
+            except Exception as err:
+                print("Error while cropping: ", err)
 
         # Events
         crop_button.click(fn=crop_click, inputs=[display, crop_data])

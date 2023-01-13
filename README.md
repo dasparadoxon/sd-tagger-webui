@@ -4,7 +4,7 @@
 
 This is a small extension for AUTOMATIC's webui. It adds a tab for tagging images from a dataset.
 
-![Screenshot of user interface](screenshot.png)
+![Screenshot of user interface](showcase/screenshot.png)
 
 ## Getting Started
 
@@ -35,8 +35,14 @@ high quality
 ...
 ```
 
+### Cropping
+
+To crop an image just left click and drag on the image. The cropped photo will be saved in
+the /crops/ folder.
+
+![Screenshot of cropping](showcase/screenshot-2.png)
+
 ## Planned Features
 
-- Cropping
 - Image Interrogate
 - ...
