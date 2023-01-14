@@ -111,8 +111,8 @@ let onPageLoad = () => {
         if(ti.pressed) {
             let x = ti.press_x - bound.x;
             let y = ti.press_y - bound.y
-            let width = mouseX - ti.press_x;
-            let height = mouseY - ti.press_y;
+            let width = Math.abs(mouseX - ti.press_x);
+            let height = Math.abs(mouseY - ti.press_y);
 
             // Chunking
             let chunk = 64;
@@ -128,6 +128,18 @@ let onPageLoad = () => {
             if (endY > bound.height)
                 height = height - (endY - bound.height)
 
+            // Realign to top-left corner if we're cropping backwards
+            let dx = (mouseX - bound.x) - x;
+            let dy = (mouseY - bound.y) - y;
+
+            if(dx < 0) {
+                x -= width;
+            }
+            if(dy < 0) {
+                y -= height;
+            }
+
+            // Update Visual
             rect.style.left = x + "px";
             rect.style.top = y + "px";
             rect.style.width = width + "px";
