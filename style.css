@@ -21,7 +21,23 @@
 }
 
 .tagging-img {
-    max-height: 500px;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+}
+
+#resize_display {
+    position: absolute;
+    display: block;
+    background-image: linear-gradient(to bottom right, transparent 50%, rgb(54, 59, 61) 50%);
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    cursor: ns-resize;
+}
+
+.max-h-full {
+    max-height: 100%;
 }

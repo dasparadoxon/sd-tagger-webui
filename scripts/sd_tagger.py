@@ -6,6 +6,7 @@ import random
 from PIL import Image
 from scripts.helpers.tagger import Tagger
 from modules import script_callbacks, sd_models
+from modules.shared import opts, OptionInfo
 
 
 # Globals
@@ -57,7 +58,7 @@ def on_ui_tabs():
                     tags_textbox = gr.Text(value=config["tags_path"], label="Path to Tags")
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
             with gr.Column():
-                gr.HTML(value=display_html)
+                gr.HTML(elem_id="display_html", value=display_html)
                 display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image")
                 with gr.Row():
                     log_count = gr.HTML(value="")
@@ -142,7 +143,8 @@ def on_ui_tabs():
 
 
 def on_ui_settings():
-    print("No settings")
+    section = ('sd-tagger', "SD Tagger")
+    #opts.add_option("cropper_mode", OptionInfo(512, "Fixed size to resize images to", section=section))
 
 
 script_callbacks.on_ui_settings(on_ui_settings)
