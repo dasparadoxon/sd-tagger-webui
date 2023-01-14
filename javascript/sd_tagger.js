@@ -120,15 +120,7 @@ let onPageLoad = () => {
             width = Math.round(width / chunk) * chunk;
             height = Math.round(height / chunk) * chunk;
 
-            let endX = x + width;
-            let endY = y + height;
-
-            if (endX > bound.width)
-                width = width - (endX - bound.width)
-            if (endY > bound.height)
-                height = height - (endY - bound.height)
-
-            // Realign to top-left corner if we're cropping backwards
+            // Realign to top-left corner of rectangle if we're cropping backwards
             let dx = (mouseX - bound.x) - x;
             let dy = (mouseY - bound.y) - y;
 
@@ -138,6 +130,24 @@ let onPageLoad = () => {
             if(dy < 0) {
                 y -= height;
             }
+
+            // Check image borders
+            if(x < 0) {
+                width += x;
+                x = 0;
+            }
+            if(y < 0) {
+                height += y;
+                y = 0;
+            }
+
+            let endX = x + width;
+            let endY = y + height;
+
+            if (endX > bound.width)
+                width = width - (endX - bound.width)
+            if (endY > bound.height)
+                height = height - (endY - bound.height)
 
             // Update Visual
             rect.style.left = x + "px";
