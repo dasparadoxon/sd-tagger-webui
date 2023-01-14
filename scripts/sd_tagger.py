@@ -58,7 +58,7 @@ def on_ui_tabs():
                     tags_textbox = gr.Text(value=config["tags_path"], label="Path to Tags")
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
             with gr.Column():
-                gr.HTML(value=display_html)
+                gr.HTML(elem_id="display_html", value=display_html)
                 display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image")
                 with gr.Row():
                     log_count = gr.HTML(value="")

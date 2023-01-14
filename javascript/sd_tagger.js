@@ -239,6 +239,10 @@ let onPageLoad = () => {
     let dd = gradioApp().querySelector("#display_data img");
     let cd = gradioApp().querySelector("#crop_data textarea");
     let cb = gradioApp().querySelector("#crop_button");
+    let dh = gradioApp().querySelector("#display_html");
+
+    // Hide display-box
+    dh.style.display = "none";
 
     let postImageLoad = setInterval(() => {
         ti = gradioApp().querySelector("#tagging_image img");
@@ -252,6 +256,9 @@ let onPageLoad = () => {
 
             display_inner.appendChild(ti);
             display.appendChild(old_html);
+
+            // Make display-box visible
+            dh.style.display = "block";
 
             // Format Tagging Image
             ti.classList.remove("w-full");
