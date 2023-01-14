@@ -6,6 +6,7 @@ import random
 from PIL import Image
 from scripts.helpers.tagger import Tagger
 from modules import script_callbacks, sd_models
+from modules.shared import opts, OptionInfo
 
 
 # Globals
@@ -142,7 +143,8 @@ def on_ui_tabs():
 
 
 def on_ui_settings():
-    print("No settings")
+    section = ('sd-tagger', "SD Tagger")
+    #opts.add_option("cropper_mode", OptionInfo(512, "Fixed size to resize images to", section=section))
 
 
 script_callbacks.on_ui_settings(on_ui_settings)

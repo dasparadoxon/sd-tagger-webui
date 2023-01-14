@@ -19,7 +19,31 @@ let onPageLoad = () => {
 
     let crop = {};
 
+    let initResizer = () => {
+        let resizeButton = gradioApp().querySelector("#resize_display");
+        let display = gradioApp().querySelector("#display");
+        let bound = display.getBoundingClientRect();
+
+        let drag = false;
+        let downY = 0;
+
+        document.addEventListener("mousemove", (e) => {
+            if(drag) {
+                display.style.height = (e.pageY - bound.y + 10) + "px";
+            }
+        });
+
+        resizeButton.onmousedown = (e) => {
+            drag = true;
+            downY = e.pageY;
+        }
+
+        document.addEventListener("mouseup", (e) => {drag = false;});
+    }
+
     let initCropper = () => {
+
+        let cancelContext = false;
 
         let cancel = () => {
             ti.pressed = false;
@@ -36,12 +60,6 @@ let onPageLoad = () => {
             ti.pressed = true;
             ti.press_x = e.pageX;
             ti.press_y = e.pageY;
-
-            // Cancel Crop
-            if(e.button === 2) {
-                cancel();
-            }
-
             e.preventDefault();
         }
 
@@ -58,32 +76,33 @@ let onPageLoad = () => {
             e.preventDefault();
         }
 
-        ti.onmousemove = mousemove;
-        ti.onmousedown = mousedown;
-        ti.onmouseup = mouseup;
+        document.addEventListener("mousemove", mousemove);
+        document.addEventListener("mouseup", mouseup);
+        document.addEventListener("mousedown", (e) => {
+            if(e.button === 2) {
+                cancel();
+                cancelContext = true;
+            }
+        });
 
-        ti.onmouseenter = (e) => {ti.hovering = true;}
-
-        ti.onmouseleave = (e) => {
-            ti.hovering = false;
-
-            // Look into alternatives. (Allow holding crop when out of frame)
-            //cancel(); // Can't do this, because mouse hovers over rect and triggers this
-            // when trying to crop.
-        }
-
-        ti.oncontextmenu = () => {return false};
+        document.addEventListener("contextmenu", (e) => {
+            if(cancelContext) {
+                e.preventDefault();
+                return false;
+            }
+        });
 
         let croppingRect = gradioApp().querySelector("#cropping_rect");
 
-        croppingRect.onmousemove = mousemove;
+        ti.onmouseenter = (e) => {ti.hovering = true;}
+        ti.onmouseleave = (e) => {ti.hovering = false;}
+        ti.onmousedown = mousedown;
         croppingRect.onmousedown = mousedown;
-        croppingRect.onmouseup = mouseup;
-        croppingRect.oncontextmenu = () => {return false};
+
     }
 
     let cropperUpdate = (mouseX, mouseY) => {
-        let bound = gradioApp().querySelector("#display div").getBoundingClientRect();
+        let bound = gradioApp().querySelector("#display img").getBoundingClientRect();
         let rect = gradioApp().querySelector("#cropping_rect");
 
         rect.style.display = ti.pressed ? "block" : "none";
@@ -199,9 +218,6 @@ let onPageLoad = () => {
     let cd = gradioApp().querySelector("#crop_data textarea");
     let cb = gradioApp().querySelector("#crop_button");
 
-    // Format Tagging Image Container
-    tic.style.maxHeight = "500px";
-
     let postImageLoad = setInterval(() => {
         ti = gradioApp().querySelector("#tagging_image img");
         if(ti) {
@@ -219,6 +235,9 @@ let onPageLoad = () => {
             ti.classList.remove("w-full");
             ti.classList.add("h-full");
             ti.classList.add("tagging-img");
+
+            // Activate Display Resize Button
+            initResizer();
 
             // Activate Image Cropper
             initCropper();
