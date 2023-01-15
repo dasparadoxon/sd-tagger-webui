@@ -42,7 +42,6 @@ let onPageLoad = () => {
     }
 
     let initCropper = () => {
-
         let cancelContext = false;
 
         let cancel = () => {
@@ -53,14 +52,14 @@ let onPageLoad = () => {
 
         let mousemove = (e) => {
             cropperUpdate(e.pageX, e.pageY);
-            e.preventDefault();
+            //e.preventDefault();
         }
 
         let mousedown = (e) => {
             ti.pressed = true;
             ti.press_x = e.pageX;
             ti.press_y = e.pageY;
-            e.preventDefault();
+            //e.preventDefault();
         }
 
         let mouseup = (e) => {
@@ -73,13 +72,13 @@ let onPageLoad = () => {
                 }
                 cancel();
             }
-            e.preventDefault();
+            //e.preventDefault();
         }
 
         document.addEventListener("mousemove", mousemove);
         document.addEventListener("mouseup", mouseup);
         document.addEventListener("mousedown", (e) => {
-            if(e.button === 2) {
+            if(e.button === 2 && ti.pressed) {
                 cancel();
                 cancelContext = true;
             }
@@ -88,20 +87,25 @@ let onPageLoad = () => {
         document.addEventListener("contextmenu", (e) => {
             if(cancelContext) {
                 e.preventDefault();
+                cancelContext = false;
                 return false;
             }
         });
 
         let croppingRect = gradioApp().querySelector("#cropping_rect");
 
+        // Connect to display image
         ti.onmouseenter = (e) => {ti.hovering = true;}
         ti.onmouseleave = (e) => {ti.hovering = false;}
         ti.onmousedown = mousedown;
+
+        // Edge case: include cropping rectangle with mousedown
         croppingRect.onmousedown = mousedown;
 
     }
 
     let cropperUpdate = (mouseX, mouseY) => {
+        // TODO Improve naming
         let bound = gradioApp().querySelector("#display img").getBoundingClientRect();
         let rect = gradioApp().querySelector("#cropping_rect");
 
@@ -109,16 +113,17 @@ let onPageLoad = () => {
         //croppingRect.style.display = ti.hovering ? "block" : "none"; // Another mode
 
         if(ti.pressed) {
+            // Calculate relative image coordinates for rectangle
             let x = ti.press_x - bound.x;
             let y = ti.press_y - bound.y
             let width = Math.abs(mouseX - ti.press_x);
             let height = Math.abs(mouseY - ti.press_y);
 
-            // Chunking
-            let chunk = 64;
+            // Snapping
+            let snap = cc.value;
 
-            width = Math.round(width / chunk) * chunk;
-            height = Math.round(height / chunk) * chunk;
+            width = Math.round(width / snap) * snap;
+            height = Math.round(height / snap) * snap;
 
             // Realign to top-left corner of rectangle if we're cropping backwards
             let dx = (mouseX - bound.x) - x;
@@ -149,12 +154,13 @@ let onPageLoad = () => {
             if (endY > bound.height)
                 height = height - (endY - bound.height)
 
-            // Update Visual
+            // Update visual
             rect.style.left = x + "px";
             rect.style.top = y + "px";
             rect.style.width = width + "px";
             rect.style.height = height + "px";
 
+            // Multiply the size difference between the real image and the display.
             let sizeRatio = ti.naturalWidth / bound.width;
 
             crop = {
@@ -203,7 +209,7 @@ let onPageLoad = () => {
         }
     }
 
-    // Update the tag states (e.g. switching images)
+    // Update the tag states (e.g. when switching images)
     let updateTags = () => {
         let split = dt.value.split(",").map((s) => {
             return s.trim();
@@ -240,6 +246,8 @@ let onPageLoad = () => {
     let cd = gradioApp().querySelector("#crop_data textarea");
     let cb = gradioApp().querySelector("#crop_button");
     let dh = gradioApp().querySelector("#display_html");
+
+    let cc = gradioApp().querySelector("#setting_cropper_snap input");
 
     // Hide display-box
     dh.style.display = "none";
