@@ -144,8 +144,8 @@ def on_ui_tabs():
 
 def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
-    #opts.add_option("cropper_mode", OptionInfo(512, "Fixed size to resize images to", section=section))
-
+    opts.add_option("cropper_snap", OptionInfo(64, "Cropper Snap (Drag)", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
+    #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=section))
 
 script_callbacks.on_ui_settings(on_ui_settings)
 script_callbacks.on_ui_tabs(on_ui_tabs)
