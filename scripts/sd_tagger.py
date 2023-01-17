@@ -93,7 +93,7 @@ def on_ui_tabs():
                 if bool(opts.display_change_save_tags):
                     tagger.current().tags = [x.strip() for x in text.split(',')]
                     tagger.current().save()
-                    print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
+                    #print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
 
         def load_tags_click(path):
             if not os.path.isfile(path):
