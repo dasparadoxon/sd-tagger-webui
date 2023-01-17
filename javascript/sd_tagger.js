@@ -201,8 +201,6 @@ let onPageLoad = () => {
                     }
                 }
                 dt.dispatchEvent(new CustomEvent("input", {}));
-                st.click();
-
             };
             tagButton.classList.remove("d-none");
             tgli.appendChild(tagButton);
@@ -232,6 +230,15 @@ let onPageLoad = () => {
         }
     }
 
+    let updateDisplayTags = () => {
+        dt.value = dti.value;
+    };
+
+    let sendDisplayUpdate = () => {
+        dti.value = dt.value;
+        dti.dispatchEvent(new CustomEvent("input", {}));
+    };
+
     /// TODO Proper Naming
     let tg = gradioApp().querySelector("#tag_list");
     let tgli = gradioApp().querySelector("#tag_list_inner");
@@ -248,6 +255,8 @@ let onPageLoad = () => {
     let dh = gradioApp().querySelector("#display_html");
 
     let cc = gradioApp().querySelector("#setting_cropper_snap input");
+
+    let dti = gradioApp().querySelector("#display_tags_internal textarea");
 
     // Hide display-box
     dh.style.display = "none";
@@ -300,8 +309,13 @@ let onPageLoad = () => {
         updateTags();
     }, 1000);
 
-    observeProperty(dt, "value", () => {
+    dt.oninput = () => {
         updateTags();
+        sendDisplayUpdate();
+    };
+
+    observeProperty(dti, "value", () => {
+        updateDisplayTags();
     }, 250);
 
     /*observeProperty(td, "value", () => {

@@ -81,7 +81,7 @@ def on_ui_tabs():
                     next_button = gr.Button(value="Next", variant="secondary")
 
         # Section used to transfer data between js and gradio
-        display_tags = gr.Text(elem_id="display_tags", visible=False)
+        display_tags = gr.Text(elem_id="display_tags_internal", visible=False)
         tags_data = gr.Text(elem_id="tags_data", visible=False)
         save_tags_button = gr.Button(elem_id="save_tags", visible=False)
         crop_data = gr.Text(elem_id="crop_data", visible=False)

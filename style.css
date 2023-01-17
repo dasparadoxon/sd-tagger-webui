@@ -58,3 +58,9 @@
 #clear_tags {
     background-color: yellow;
 }
+
+#tags_button_group {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
