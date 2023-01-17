@@ -68,7 +68,7 @@ def on_ui_tabs():
                 with gr.Row(variant="panel"):
                     interrogate_button = gr.Button(value="Interrogate", variant="secondary")
                     interrogate_append_method = gr.Radio(value="Replace", choices=["Replace", "Prepend", "Append"], label="Append Options", interactive=True)
-                    interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Interrogate Threshold", interactive=True)
+                    interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Threshold", interactive=True)
             # Right Side
             with gr.Column():
                 gr.HTML(elem_id="display_html", value=display_html)
