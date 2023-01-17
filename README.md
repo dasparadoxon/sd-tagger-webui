@@ -17,7 +17,7 @@ It **does not** support captions in the filename yet.
 
 ### Tags.txt
 
-For tagging you can provide a tags file which has each tag on a new line.
+For tagging you can provide a tags file with each tag on a new line.
 
 ```
 from above
