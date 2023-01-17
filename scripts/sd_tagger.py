@@ -24,12 +24,15 @@ config_file = "extensions/sd-tagger-webui/config.json"
 
 tag_list_file = "extensions/sd-tagger-webui/html/tag_list.html"
 display_file = "extensions/sd-tagger-webui/html/display.html"
+display_tags_file = "extensions/sd-tagger-webui/html/display_tags.html"
 
 # Import HTML
 with open(tag_list_file, "r") as f:
     tag_list_html = f.read()
 with open(display_file, "r") as f:
     display_html = f.read()
+with open(display_tags_file, "r") as f:
+    display_tags_html = f.read()
 
 # Import Config
 if os.path.isfile(config_file):
@@ -55,7 +58,7 @@ def on_ui_tabs():
         with gr.Row():
             # Left Side
             with gr.Column(variant="panel"):
-                display_tags = gr.TextArea(elem_id="display_tags", value="", label="Tags", interactive=True)
+                gr.HTML(value=display_tags_html)
                 with gr.Row(variant="panel"):
                     with gr.Column():
                         gr.HTML(elem_id="tag_list", value=tag_list_html)
@@ -78,6 +81,7 @@ def on_ui_tabs():
                     next_button = gr.Button(value="Next", variant="secondary")
 
         # Section used to transfer data between js and gradio
+        display_tags = gr.Text(elem_id="display_tags", visible=False)
         tags_data = gr.Text(elem_id="tags_data", visible=False)
         save_tags_button = gr.Button(elem_id="save_tags", visible=False)
         crop_data = gr.Text(elem_id="crop_data", visible=False)

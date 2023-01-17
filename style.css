@@ -41,3 +41,20 @@
 .max-h-full {
     max-height: 100%;
 }
+
+#display_tags_label {
+    top: -0.6em;
+    left: 1em;
+}
+
+#undo_tags {
+    background-color: red;
+}
+
+#reset_tags {
+    background-color: green;
+}
+
+#clear_tags {
+    background-color: yellow;
+}
