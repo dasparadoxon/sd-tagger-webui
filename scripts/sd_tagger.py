@@ -146,12 +146,15 @@ def on_ui_tabs():
             print("Threshold:", threshold, "Got:", len(predict_tags), "Tags")
             predict_tags = ", ".join(predict_tags)
 
+            if len(image_tags) == 0:
+                return predict_tags
+
             if append_method == "Replace":
                 return predict_tags
             elif append_method == "Prepend":
-                return predict_tags + image_tags
+                return predict_tags + ", " + image_tags
             elif append_method == "Append":
-                return image_tags + predict_tags
+                return image_tags + ", " + predict_tags
 
         # Events
         crop_button.click(fn=crop_click, inputs=[display, crop_data])
