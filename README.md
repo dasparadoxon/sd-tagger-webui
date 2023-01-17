@@ -42,7 +42,15 @@ the /crops/ folder.
 
 ![Screenshot of cropping](showcase/screenshot-2.png)
 
+### Interrogate
+
+You can interrogate an image using DeepDanbooru by clicking the interrogate button.
+
+![Screenshot of interrogate](showcase/screenshot-3.png)
+
 ## Planned Features
 
-- Image Interrogate
+- Faster loading
+- More interrogators
+- Tag pagination
 - ...
