@@ -22,6 +22,7 @@ config = {
 
 config_file = "extensions/sd-tagger-webui/config.json"
 
+# TODO Improve
 tag_list_file = "extensions/sd-tagger-webui/html/tag_list.html"
 display_file = "extensions/sd-tagger-webui/html/display.html"
 display_tags_file = "extensions/sd-tagger-webui/html/display_tags.html"
@@ -34,6 +35,7 @@ with open(display_file, "r") as f:
 with open(display_tags_file, "r") as f:
     display_tags_html = f.read()
 
+# TODO Switch to options?
 # Import Config
 if os.path.isfile(config_file):
     with open(config_file, "r") as f:
