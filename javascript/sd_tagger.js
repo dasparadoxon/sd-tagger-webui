@@ -244,6 +244,7 @@ let onPageLoad = () => {
     };
 
     let onImageChange = () => {
+        console.log("Image change!");
         updateTags();
     };
 
@@ -268,7 +269,7 @@ let onPageLoad = () => {
 
     let ct = gradioApp().querySelector("#clear_tags");
 
-    let ii = gradioApp().querySelector("#image_index");
+    let ii = gradioApp().querySelector("#image_index #image_index");
 
     // Clear tags button
     ct.onclick = () => {
@@ -337,7 +338,7 @@ let onPageLoad = () => {
         updateDisplayTags();
     }, 250);
 
-    observeProperty(ii, "value", () => {
+    observeProperty(ii, "innerText", () => {
         onImageChange();
     }, 250);
 }
