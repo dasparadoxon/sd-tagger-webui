@@ -244,7 +244,6 @@ let onPageLoad = () => {
     };
 
     let onImageChange = () => {
-        console.log("Image change!");
         updateTags();
     };
 
