@@ -243,6 +243,10 @@ let onPageLoad = () => {
         dti.dispatchEvent(new CustomEvent("input", {}));
     };
 
+    let onImageChange = () => {
+        updateTags();
+    };
+
     /// TODO Proper Naming
     let tg = gradioApp().querySelector("#tag_list");
     let tgli = gradioApp().querySelector("#tag_list_inner");
@@ -263,6 +267,8 @@ let onPageLoad = () => {
     let dti = gradioApp().querySelector("#display_tags_internal textarea");
 
     let ct = gradioApp().querySelector("#clear_tags");
+
+    let ii = gradioApp().querySelector("#image_index");
 
     // Clear tags button
     ct.onclick = () => {
@@ -331,9 +337,9 @@ let onPageLoad = () => {
         updateDisplayTags();
     }, 250);
 
-    /*observeProperty(td, "value", () => {
-        ti.src = dd.src;
-    }, 250);*/
+    observeProperty(ii, "value", () => {
+        onImageChange();
+    }, 250);
 }
 
 
