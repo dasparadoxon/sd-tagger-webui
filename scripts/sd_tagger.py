@@ -70,7 +70,7 @@ def on_ui_tabs():
                 with gr.Row(variant="panel"):
                     interrogate_button = gr.Button(value="Interrogate", variant="secondary")
                     interrogate_append_method = gr.Radio(value="Replace", choices=["Replace", "Prepend", "Append"], label="Append Options", interactive=True)
-                    interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Interrogate Threshold", interactive=True)
+                    interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Threshold", interactive=True)
             # Right Side
             with gr.Column():
                 gr.HTML(elem_id="display_html", value=display_html)
@@ -95,7 +95,7 @@ def on_ui_tabs():
                 if bool(opts.display_change_save_tags):
                     tagger.current().tags = [x.strip() for x in text.split(',')]
                     tagger.current().save()
-                    print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
+                    #print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
 
         def load_tags_click(path):
             if not os.path.isfile(path):

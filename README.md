@@ -1,7 +1,5 @@
 # Stable Diffusion WebUI Tagger
 
-*Work in Progress*
-
 This is a small extension for AUTOMATIC's webui. It adds a tab for tagging images from a dataset.
 
 ![Screenshot of user interface](showcase/screenshot.png)
@@ -19,7 +17,7 @@ It **does not** support captions in the filename yet.
 
 ### Tags.txt
 
-You can also provide a tags file with each tag on a new line.
+For tagging you can provide a tags file with each tag on a new line.
 
 ```
 from above
@@ -37,12 +35,21 @@ high quality
 
 ### Cropping
 
-To crop an image just left click and drag on the image. The cropped photo will be saved in
-the /crops/ folder.
+To crop an image just left-click and drag on the image. The cropped photo will be saved in
+the /crops/ folder. By default, it snaps to a 64 pixel grid, you can change this in the settings.
 
 ![Screenshot of cropping](showcase/screenshot-2.png)
 
+### Interrogate
+
+You can interrogate an image using DeepDanbooru by clicking the interrogate button.
+
+![Screenshot of interrogate](showcase/screenshot-3.png)
+
 ## Planned Features
 
-- Image Interrogate
+- Faster loading
+- More interrogators
+- Tag pagination
+- Cropping modes (Brush)
 - ...
