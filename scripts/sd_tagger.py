@@ -95,7 +95,8 @@ def on_ui_tabs():
                 if bool(opts.display_change_save_tags):
                     tagger.current().tags = [x.strip() for x in text.split(',')]
                     tagger.current().save()
-                    #print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
+                    if bool(opts.print_save_tags):
+                        print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
 
         def load_tags_click(path):
             if not os.path.isfile(path):
@@ -149,7 +150,8 @@ def on_ui_tabs():
                 return image_tags
 
             predict_tags = deep.predict(image, threshold).keys()
-            print("Threshold:", threshold, "Got:", len(predict_tags), "Tags")
+            if bool(opts.print_interrogate):
+                print("Threshold:", threshold, "Got:", len(predict_tags), "Tags")
             predict_tags = ", ".join(predict_tags)
 
             if len(image_tags) == 0:
@@ -178,8 +180,10 @@ def on_ui_tabs():
 
 def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
-    opts.add_option("cropper_snap", OptionInfo(64, "Cropper Snap (Drag)", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
-    opts.add_option("display_change_save_tags", OptionInfo(True, "Save Tags on Scroll", section=section))
+    opts.add_option("cropper_snap", OptionInfo(64, "Cropper grid snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
+    opts.add_option("display_change_save_tags", OptionInfo(True, "Automatically save tags on scroll", section=section))
+    opts.add_option("print_save_tags", OptionInfo(False, "Log when tags are saved", section=section))
+    opts.add_option("print_interrogate", OptionInfo(False, "Log when interrogating", section=section))
     #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=section))
 
 script_callbacks.on_ui_settings(on_ui_settings)
