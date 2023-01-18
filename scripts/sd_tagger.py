@@ -144,6 +144,10 @@ def on_ui_tabs():
                 print("Error while cropping: ", err)
 
         def interrogate_click(image, image_tags, append_method, threshold):
+            if image is None:
+                print("Interrogate failed. No images loaded.")
+                return image_tags
+
             predict_tags = deep.predict(image, threshold).keys()
             print("Threshold:", threshold, "Got:", len(predict_tags), "Tags")
             predict_tags = ", ".join(predict_tags)

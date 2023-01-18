@@ -189,7 +189,11 @@ let onPageLoad = () => {
                 if (tagButton.classList.contains("gr-button-primary")) {
                     tagButton.classList.remove("gr-button-primary");
                     if(dt.value) {
-                        let split = dt.value.split(", ");
+                        // TODO Write a function for sanitizing the tag box
+                        // Make removing empty tags optional.
+                        let split = dt.value.split(",").map((s) => {
+                            return s.trim();
+                        });
                         dt.value = split.filter(tag => tag !== tagButton.innerText).join(", ");
                     }
                 } else {
@@ -257,6 +261,15 @@ let onPageLoad = () => {
     let cc = gradioApp().querySelector("#setting_cropper_snap input");
 
     let dti = gradioApp().querySelector("#display_tags_internal textarea");
+
+    let ct = gradioApp().querySelector("#clear_tags");
+
+    // Clear tags button
+    ct.onclick = () => {
+        dt.value = "";
+        updateTags();
+        sendDisplayUpdate();
+    }
 
     // Hide display-box
     dh.style.display = "none";
