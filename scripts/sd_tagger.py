@@ -3,6 +3,8 @@ import json
 import gradio as gr
 import base64
 import random
+import tempfile
+import shutil
 from PIL import Image
 from scripts.helpers.tagger import Tagger
 from scripts.helpers.interrogate import DeepDanbooru
@@ -46,6 +48,16 @@ def save_config():
     with open(config_file, "w") as f:
         json.dump(config, f)
 
+# Copy to Temp
+def create_temporary_copy(src):
+    tf = tempfile.TemporaryFile(mode='r+b', prefix='tmp', suffix='.png')
+    with open(src, 'r+b') as f:
+        shutil.copyfileobj(f, tf)
+    tf.seek(0)
+    return tf
+
+def preload():
+    preload_amount = 10
 
 def on_ui_tabs():
     with gr.Blocks(analytics_enabled=False) as sd_tagger:

@@ -271,10 +271,12 @@ let onPageLoad = () => {
     let ii = gradioApp().querySelector("#image_index #image_index");
 
     // Clear tags button
-    ct.onclick = () => {
-        dt.value = "";
-        updateTags();
-        sendDisplayUpdate();
+    if(ct) {
+        ct.onclick = () => {
+            dt.value = "";
+            updateTags();
+            sendDisplayUpdate();
+        }
     }
 
     // Hide display-box
