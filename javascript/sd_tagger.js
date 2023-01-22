@@ -291,6 +291,7 @@ let onPageLoad = () => {
 
             old_html.style.position = "absolute";
             old_html.style.top = "100%";
+            old_html.style.border = "none";
 
             display_inner.appendChild(ti);
             display.appendChild(old_html);
