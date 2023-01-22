@@ -23,7 +23,8 @@ class Tagger:
     def __init__(self, path):
         self.index = 0
         self.path = path
-        self.dataset = self.loadDataset(path)
+        self.tags = set()
+        self.dataset = self.load_dataset(path)
         self.num_files = len(self.dataset)
 
     def set(self, index):
@@ -42,12 +43,15 @@ class Tagger:
     def current(self):
         return self.dataset[self.index]
 
-    def loadDataset(self, path):
+    def load_dataset(self, path):
         files = recursive_dir(path, '.png')
         files = sort(files)
         dataset = []
         for f in files:
-            dataset.append(DatasetImage(f))
+            img_data = DatasetImage(f)
+            for t in img_data.tags:
+                self.tags.add(t)
+            dataset.append(img_data)
         return dataset
 
 

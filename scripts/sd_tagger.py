@@ -5,6 +5,7 @@ import base64
 import random
 import tempfile
 import shutil
+import re
 from PIL import Image
 from scripts.helpers.tagger import Tagger
 from scripts.helpers.interrogate import DeepDanbooru
@@ -77,6 +78,8 @@ def on_ui_tabs():
                     with gr.Column():
                         gr.HTML(elem_id="tag_list", value=tag_list_html)
                 with gr.Row(variant="panel"):
+                    tags_radio = gr.Radio(value="", choices=["Dataset Tags", "File"], label="Tag Set", interactive=True)
+                with gr.Row(variant="panel"):
                     tags_textbox = gr.Text(value=config["tags_path"], label="Path to Tags")
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
                 with gr.Row(variant="panel"):
@@ -120,7 +123,7 @@ def on_ui_tabs():
             if not os.path.isfile(path):
                 return gr.update(visible=True), f"Error: Invalid Tags Path", None
             with open(path, 'r') as f:
-                tags = list(dict.fromkeys([line.rstrip() for line in f]))
+                tags = list(dict.fromkeys([line.rstrip().replace('"', '') for line in f]))
             config["tags_path"] = path
             save_config()
             return gr.update(visible=True), f"Successfully imported {len(tags)} tags from {path}", tags
@@ -182,6 +185,12 @@ def on_ui_tabs():
             elif append_method == "Append":
                 return image_tags + ", " + predict_tags
 
+        def tags_radio_update(value, tags_data):
+            if value == "Dataset Tags":
+                return [tag.replace('"', '') for tag in list(tagger.tags)], gr.update(visible=False), gr.update(visible=False)
+            elif value == "File":
+                return tags_data, gr.update(visible=True), gr.update(visible=True)
+
         # Events
         crop_button.click(fn=crop_click, inputs=[display, crop_data])
         interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags])
@@ -192,6 +201,7 @@ def on_ui_tabs():
         next_button.click(fn=next_click, inputs=[display_index], outputs=[display_index])
         display.change(fn=display_update, outputs=[display_tags, log_count, display_index])
         display_index.change(fn=index_update, inputs=[display_tags, display_index], outputs=[display])
+        tags_radio.change(fn=tags_radio_update, inputs=[tags_radio, tags_data], outputs=[tags_data, load_tags_button, tags_textbox])
 
     return (sd_tagger, "SD Tagger", "sd_tagger"),
 
