@@ -2,7 +2,7 @@
 
 This is a small extension for AUTOMATIC's webui. It adds a tab for tagging images from a dataset.
 
-![Screenshot of user interface](showcase/screenshot.png)
+![Screenshot of user interface](resources/showcase/screenshot.png)
 
 ## Getting Started
 
@@ -38,13 +38,13 @@ high quality
 To crop an image just left-click and drag on the image. The cropped photo will be saved in
 the /crops/ folder. By default, it snaps to a 64 pixel grid, you can change this in the settings.
 
-![Screenshot of cropping](showcase/screenshot-2.png)
+![Screenshot of cropping](resources/showcase/screenshot-2.png)
 
 ### Interrogate
 
 You can interrogate an image using DeepDanbooru by clicking the interrogate button.
 
-![Screenshot of interrogate](showcase/screenshot-3.png)
+![Screenshot of interrogate](resources/showcase/screenshot-3.png)
 
 ## Planned Features
 
