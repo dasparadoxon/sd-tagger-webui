@@ -53,6 +53,7 @@ def assert_run_params(func, params: list, reason: str):
         print(ex)
         raise AssertionError("ASSERT_RUN FAILED [\"" + reason + "\"]")
 
+
 def assert_file(path: str, reason: str):
     if not os.path.isfile(path):
         raise AssertionError("ASSERT_FILE FAILED [\"" + reason + "\"]")
