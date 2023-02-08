@@ -13,11 +13,15 @@ Just install the extension through the extensions tab or git clone into your ext
 ### Dataset
 
 Provide the dataset path and it will **recursively** find matching images and captions pairs *(e.g. example.txt / example.png)*. 
-It **does not** support captions in the filename yet.
+It **does not** support captions in the filename.
 
-### Tags.txt
+### Tags
 
-For tagging you can provide a tags file with each tag on a new line.
+For tagging you can provide either a separate tags file with each tag on a new line or use the tags present in your dataset.
+
+![Screenshot of cropping](resources/showcase/screenshot-4.png)
+
+The format for a tags file is as follows
 
 ```
 from above
