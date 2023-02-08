@@ -80,7 +80,7 @@ def on_ui_tabs():
             # Right Side
             with gr.Column():
                 gr.HTML(elem_id="display_html", value=display_html)
-                display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image")
+                display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image", type="pil")
                 with gr.Row():
                     log_count = gr.HTML(elem_id="image_index", value="")
                     display_index = gr.Slider(label="Dataset Index", interactive=True)
