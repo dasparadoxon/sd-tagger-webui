@@ -86,10 +86,15 @@ def test_tagger():
     assert_equals(img_data.tags[0], "red", "First item should be the [red, square]")
 
 
+# Run Tests #
+
+
 def run_tests():
     test_tagger()
 
 
-print("Running tests.")
+# Entry Point #
+
+
 run_tests()
-print("Testing finished.")
+print("Tests Done.")
