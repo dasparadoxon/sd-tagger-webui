@@ -129,7 +129,7 @@ def on_ui_tabs():
             tagger = Tagger(path)
             config["dataset_path"] = path
             save_config()
-            return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", 1
+            return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1
 
         def previous_click(index):
             return gr.update(value=index - 1)
@@ -190,7 +190,7 @@ def on_ui_tabs():
         interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags])
         save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
         load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, tags_data])
-        process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display_index])
+        process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display, display_index])
         previous_button.click(fn=previous_click, inputs=[display_index], outputs=[display_index])
         next_button.click(fn=next_click, inputs=[display_index], outputs=[display_index])
         display.change(fn=display_update, outputs=[display_tags, log_count, display_index])
