@@ -66,12 +66,15 @@ def test_tagger():
     assert_except(tagger.current, "Tagger.current() should always except if the dataset is empty")
     assert_run(tagger.next, "Tagger.next() should run on an empty dataset")
     assert_run(tagger.previous, "Tagger.previous() should run on an empty dataset")
-    assert_except_params(tagger.get, [0], "Tagger.get() should except on an empty dataset")
+    assert_except_params(tagger.get_image, [0], "Tagger.get_image() should except on an empty dataset")
 
     # Load testing dataset
     tagger = Tagger("./resources/testing/dataset")
 
-    # Traversal
+    # Verify that there are only 3 images
+    assert_equals(tagger.num_files, 3, "Tagger should have three images")
+
+    # Testing previous() current() next()
     tagger.previous()
     assert_equals(tagger.index, tagger.num_files - 1, "Tagger index should be the last index")
 
@@ -81,9 +84,28 @@ def test_tagger():
     tagger.next()
     assert_equals(tagger.index, 0, "Tagger index should be 0")
 
-    img_data = try_function_get_output(tagger.get, [0])
-    assert_except_params(tagger.get, [-1], "Tagger.get() should except on out of bounds")
+    # Testing get_image()
+    img_data = try_function_get_output(tagger.get_image, [0])
+    assert_except_params(tagger.get_image, [-1], "Tagger.get_image() should except on lower out of bounds")
+    assert_except_params(tagger.get_image, [3], "Tagger.get_image() should except on upper out of bounds")
     assert_equals(img_data.tags[0], "red", "First item should be the [red, square]")
+
+    # Testing set_image()
+
+
+    # Load no txt dataset
+    tagger = Tagger("./resources/testing/dataset-no-txt")
+
+    # Get tags for first image
+    img_data = try_function_get_output(tagger.get_image, [0])
+
+    # Verify that tags for this image are empty
+    assert_equals(img_data.tags, [], "Tags should be empty")
+
+    # Write the tags and then save
+    img_data.tags = ["red, square"]
+    img_data.save()
+
 
 
 # Run Tests #

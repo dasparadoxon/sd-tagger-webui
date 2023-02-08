@@ -25,51 +25,73 @@ class Tagger:
             raise NotADirectoryError("Invalid dataset path", path)
         self.index = 0
         self.path = path
-        self.dataset, self.tags = load_dataset(path)
+        self.dataset = load_dataset(path)
+        self.tags = load_dataset_tags(self.dataset)
         self.num_files = len(self.dataset)
 
     # TODO Add/Remove Functions
     # def add(self):
     # def remove(self, index):
 
-    def set(self, index: int):
+    def set_index(self, index: int):
         self.index = index
         if self.index < 0:
             self.index = self.num_files - 1
         if self.index >= self.num_files:
             self.index = 0
 
-    def get(self, index: int):
+    def set_image(self, index: int, image: DatasetImage):
+        # Update tag counts
+        old_image = self.get_image(index)
+        for t in old_image.tags:
+            self.tags[t] = self.tags[t] - 1
+            if self.tags[t] <= 0:
+                del self.tags[t]
+        for t in image.tags:
+            if t in self.tags:
+                self.tags[t] = self.tags[t] + 1
+            else:
+                self.tags[t] = 1
+        self.dataset[index] = image
+
+    def get_image(self, index: int):
         if self.num_files == 0:
             raise LookupError("Dataset is empty")
         if index < 0 or index >= self.num_files:
             raise IndexError("Got subscript", index, "which is out of bounds of 0 to", self.num_files - 1)
         return self.dataset[index]
 
-    # Stepping Functions #
     def next(self):
-        self.set(self.index + 1)
+        self.set_index(self.index + 1)
 
     def previous(self):
-        self.set(self.index - 1)
+        self.set_index(self.index - 1)
 
     def current(self):
-        return self.get(self.index)
+        return self.get_image(self.index)
 
 
 # Helper Functions #
+
+
 def load_dataset(path: str):
     files = recursive_dir(path, '.png')
     files = sort(files)
     dataset = []
-    tags = set()
     for f in files:
-        img_data = DatasetImage(f)
-        # Catalogue all the dataset tags #
-        for t in img_data.tags:
-            tags.add(t)
-        dataset.append(img_data)
-    return dataset, tags
+        dataset.append(DatasetImage(f))
+    return dataset
+
+
+def load_dataset_tags(dataset: list):
+    tags = {}
+    for img in dataset:
+        for t in img.tags:
+            if t in tags:
+                tags[t] = tags[t] + 1
+            else:
+                tags[t] = 1
+    return tags
 
 
 def get_tagfile(path: str):
