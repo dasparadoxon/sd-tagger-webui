@@ -60,7 +60,7 @@ class Tagger:
 
 
 def load_dataset(path: str):
-    files = recursive_dir(path, '.png')
+    files = recursive_dir(path, [".png", ".jpg", ".jpeg", "webp"])
     files = sort(files)
     dataset = []
     for f in files:
@@ -103,14 +103,15 @@ def sort(l: list):
     return sorted(l, key=alphanum_key)
 
 
-def recursive_dir(path: str, ext: str):
+def recursive_dir(path: str, exts: list):
     r = []
     for f in os.listdir(path):
         jf = os.path.join(path, f)
         if os.path.isdir(jf):
-            r += recursive_dir(jf, ext)
+            r += recursive_dir(jf, exts)
         elif os.path.isfile(jf):
-            if jf.lower().endswith(ext):
-                r.append(jf)
+            for ext in exts:
+                if jf.lower().endswith(ext):
+                    r.append(jf)
     return r
 
