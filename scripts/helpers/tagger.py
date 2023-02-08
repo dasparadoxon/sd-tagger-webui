@@ -26,7 +26,6 @@ class Tagger:
         self.index = 0
         self.path = path
         self.dataset = load_dataset(path)
-        self.tags = load_dataset_tags(self.dataset)
         self.num_files = len(self.dataset)
 
     # TODO Add/Remove Functions
@@ -39,20 +38,6 @@ class Tagger:
             self.index = self.num_files - 1
         if self.index >= self.num_files:
             self.index = 0
-
-    def set_image(self, index: int, image: DatasetImage):
-        # Update tag counts
-        old_image = self.get_image(index)
-        for t in old_image.tags:
-            self.tags[t] = self.tags[t] - 1
-            if self.tags[t] <= 0:
-                del self.tags[t]
-        for t in image.tags:
-            if t in self.tags:
-                self.tags[t] = self.tags[t] + 1
-            else:
-                self.tags[t] = 1
-        self.dataset[index] = image
 
     def get_image(self, index: int):
         if self.num_files == 0:

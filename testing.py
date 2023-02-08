@@ -1,3 +1,4 @@
+import os
 from scripts.helpers.tagger import Tagger
 
 # Helper functions #
@@ -52,6 +53,10 @@ def assert_run_params(func, params: list, reason: str):
         print(ex)
         raise AssertionError("ASSERT_RUN FAILED [\"" + reason + "\"]")
 
+def assert_file(path: str, reason: str):
+    if not os.path.isfile(path):
+        raise AssertionError("ASSERT_FILE FAILED [\"" + reason + "\"]")
+
 
 # Begin Tests #
 
@@ -90,9 +95,6 @@ def test_tagger():
     assert_except_params(tagger.get_image, [3], "Tagger.get_image() should except on upper out of bounds")
     assert_equals(img_data.tags[0], "red", "First item should be the [red, square]")
 
-    # Testing set_image()
-
-
     # Load no txt dataset
     tagger = Tagger("./resources/testing/dataset-no-txt")
 
@@ -105,7 +107,8 @@ def test_tagger():
     # Write the tags and then save
     img_data.tags = ["red, square"]
     img_data.save()
-
+    assert_file(img_data.tagfile, "When save is called it should create a txt file")
+    os.remove(img_data.tagfile)
 
 
 # Run Tests #
