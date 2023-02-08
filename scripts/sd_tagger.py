@@ -49,16 +49,6 @@ def save_config():
     with open(config_file, "w") as f:
         json.dump(config, f)
 
-# Copy to Temp
-def create_temporary_copy(src):
-    tf = tempfile.TemporaryFile(mode='r+b', prefix='tmp', suffix='.png')
-    with open(src, 'r+b') as f:
-        shutil.copyfileobj(f, tf)
-    tf.seek(0)
-    return tf
-
-def preload():
-    preload_amount = 10
 
 def on_ui_tabs():
     with gr.Blocks(analytics_enabled=False) as sd_tagger:
@@ -89,7 +79,7 @@ def on_ui_tabs():
             # Right Side
             with gr.Column():
                 gr.HTML(elem_id="display_html", value=display_html)
-                display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image", type="pil")
+                display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image")
                 with gr.Row():
                     log_count = gr.HTML(elem_id="image_index", value="")
                     display_index = gr.Slider(label="Dataset Index", interactive=True)
@@ -135,7 +125,7 @@ def on_ui_tabs():
             tagger = Tagger(path)
             config["dataset_path"] = path
             save_config()
-            return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path
+            return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", 1
 
         def previous_click(index):
             return gr.update(value=index - 1)
@@ -148,7 +138,7 @@ def on_ui_tabs():
 
         def index_update(image_tags, index):
             save_tags_click(image_tags)
-            tagger.set(index - 1)
+            tagger.set_index(index - 1)
             return tagger.current().path
 
         def crop_click(image, crop_json):
@@ -196,7 +186,7 @@ def on_ui_tabs():
         interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags])
         save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
         load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, tags_data])
-        process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display])
+        process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display_index])
         previous_button.click(fn=previous_click, inputs=[display_index], outputs=[display_index])
         next_button.click(fn=next_click, inputs=[display_index], outputs=[display_index])
         display.change(fn=display_update, outputs=[display_tags, log_count, display_index])
