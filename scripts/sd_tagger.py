@@ -8,6 +8,7 @@ import shutil
 import re
 from PIL import Image
 from scripts.helpers.tagger import Tagger
+from scripts.helpers.tagger import load_dataset_tags
 from scripts.helpers.interrogate import DeepDanbooru
 from modules import script_callbacks, sd_models
 from modules.shared import opts, OptionInfo
@@ -74,7 +75,7 @@ def on_ui_tabs():
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
                 with gr.Row(variant="panel"):
                     interrogate_button = gr.Button(value="Interrogate", variant="secondary")
-                    interrogate_append_method = gr.Radio(value="Replace", choices=["Replace", "Prepend", "Append"], label="Append Options", interactive=True)
+                    interrogate_append_method = gr.Radio(value="Replace", choices=["Replace", "Before", "After"], label="Append Options", interactive=True)
                     interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Threshold", interactive=True)
             # Right Side
             with gr.Column():
@@ -104,7 +105,10 @@ def on_ui_tabs():
         def save_tags_click(text):
             if tagger:
                 if bool(opts.display_change_save_tags):
-                    tagger.current().tags = [x.strip() for x in text.split(',')]
+                    if text:
+                        tagger.current().tags = [x.strip() for x in text.split(',')]
+                    else:
+                        tagger.current().tags = []
                     tagger.current().save()
                     if bool(opts.print_save_tags):
                         print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
@@ -170,14 +174,14 @@ def on_ui_tabs():
 
             if append_method == "Replace":
                 return predict_tags
-            elif append_method == "Prepend":
+            elif append_method == "Before":
                 return predict_tags + ", " + image_tags
-            elif append_method == "Append":
+            elif append_method == "After":
                 return image_tags + ", " + predict_tags
 
         def tags_radio_update(value, tags_data):
             if value == "Dataset Tags":
-                return [tag.replace('"', '') for tag in list(tagger.tags)], gr.update(visible=False), gr.update(visible=False)
+                return [tag.replace('"', '') for tag in list(load_dataset_tags(tagger.dataset).keys())], gr.update(visible=False), gr.update(visible=False)
             elif value == "File":
                 return tags_data, gr.update(visible=True), gr.update(visible=True)
 
