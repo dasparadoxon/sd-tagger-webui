@@ -250,6 +250,7 @@ def on_ui_settings():
     opts.add_option("print_save_tags", OptionInfo(False, "Log when tags are saved", section=section))
     opts.add_option("print_interrogate", OptionInfo(False, "Log when interrogating", section=section))
     opts.add_option("highlight_duplicate", OptionInfo(True, "Highlight duplicate tags", section=section))
+    opts.add_option("open_tag_wiki", OptionInfo(False, "Middle-click on tag to view wiki", section=section))
     #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=
 
 script_callbacks.on_ui_settings(on_ui_settings)

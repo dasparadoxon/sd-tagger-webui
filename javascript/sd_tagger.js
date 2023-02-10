@@ -228,7 +228,15 @@ let onPageLoad = () => {
             let tagButton = tb.cloneNode(true);
             tagButton.id = "";
             tagButton.innerText = tags[i];
-            tagButton.onclick = () => {
+            tagButton.onmousedown = (e) => {
+                if(e.button === 1) {
+                    if(vw.checked) {
+                        window.open("https://danbooru.donmai.us/wiki_pages/" + tagButton.innerText.replace(" ", "_"), '_blank');
+                        return false;
+                    }
+                }
+            }
+            tagButton.onclick = (e) => {
                 if (tagButton.classList.contains("gr-button-primary")) {
                     tagButton.classList.remove("gr-button-primary");
                     if(dt.value) {
@@ -324,6 +332,7 @@ let onPageLoad = () => {
     let ai = gradioApp().querySelector("#setting_auto_interrogate input");
     let mtc = gradioApp().querySelector("#setting_max_tag_count input");
     let hld = gradioApp().querySelector("#setting_highlight_duplicate input");
+    let vw = gradioApp().querySelector("#setting_open_tag_wiki input");
 
     let ib = gradioApp().querySelector("#interrogate_button");
 
