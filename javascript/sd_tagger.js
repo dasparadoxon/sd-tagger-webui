@@ -18,6 +18,8 @@ let observeProperty = (obj, property, callback, time = 250, compare) => {
 let onPageLoad = () => {
 
     let crop = {};
+    let shiftKey = false;
+    let lastX, lastY;
 
     let initResizer = () => {
         let resizeButton = gradioApp().querySelector("#resize_display");
@@ -52,6 +54,8 @@ let onPageLoad = () => {
 
         let mousemove = (e) => {
             cropperUpdate(e.pageX, e.pageY);
+            lastX = e.pageX;
+            lastY = e.pageY;
             //e.preventDefault();
         }
 
@@ -92,6 +96,20 @@ let onPageLoad = () => {
             }
         });
 
+        document.addEventListener("keydown", (e) => {
+            if(!shiftKey && e.shiftKey) {
+                shiftKey = e.shiftKey
+                cropperUpdate(lastX, lastY);
+            }
+        });
+
+        document.addEventListener("keyup", (e) => {
+            if(shiftKey && !e.shiftKey) {
+                shiftKey = e.shiftKey
+                cropperUpdate(lastX, lastY);
+            }
+        });
+
         let croppingRect = gradioApp().querySelector("#cropping_rect");
 
         // Connect to display image
@@ -127,6 +145,12 @@ let onPageLoad = () => {
 
             width = Math.round(width / snap) * snap;
             height = Math.round(height / snap) * snap;
+
+            if(shiftKey)
+                if(width >= height)
+                    height = width;
+                else
+                    width = height;
 
             // Realign to top-left corner of rectangle if we're cropping backwards
             let dx = (mouseX - bound.x) - x;
