@@ -89,15 +89,14 @@ def on_ui_tabs():
                 with gr.Row():
                     previous_button = gr.Button(value="Previous", variant="secondary")
                     next_button = gr.Button(value="Next", variant="secondary")
+                with gr.Row():
+                    save_tags_button = gr.Button(value="Save Tags", elem_id="save_tags")
 
         # Section used to transfer data between js and gradio
         display_tags = gr.Text(elem_id="display_tags_internal", visible=False)
 
         # General user loaded tags.
         tags_data = gr.Text(elem_id="tags_data", visible=False)
-
-        # Save Image Tags
-        save_tags_button = gr.Button(elem_id="save_tags", visible=False)
 
         # Cropping
         crop_data = gr.Text(elem_id="crop_data", visible=False)

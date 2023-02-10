@@ -50,18 +50,6 @@
     left: 1em;
 }
 
-#undo_tags {
-    background-color: red;
-}
-
-#reset_tags {
-    background-color: green;
-}
-
-#clear_tags {
-    background-color: yellow;
-}
-
 #reload_tags {
     padding: 5px;
 }

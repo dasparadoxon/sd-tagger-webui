@@ -20,6 +20,7 @@ let onPageLoad = () => {
     let crop = {};
     let shiftKey = false;
     let lastX, lastY;
+    let originalTags;
 
     let initResizer = () => {
         let resizeButton = gradioApp().querySelector("#resize_display");
@@ -312,16 +313,26 @@ let onPageLoad = () => {
 
     let dti = gradioApp().querySelector("#display_tags_internal textarea");
 
-    let ct = gradioApp().querySelector("#clear_tags");
+
 
     let ii = gradioApp().querySelector("#image_index #image_index");
 
     let rt = gradioApp().querySelector("#reload_tags");
 
+    let ct = gradioApp().querySelector("#clear_tags");
+
+    let rvt = gradioApp().querySelector("#revert_tags");
+
     // Clear tags button
     if(ct) {
         ct.onclick = () => {
             dt.value = "";
+            updateTags();
+            sendDisplayUpdate();
+        }
+
+        rvt.onclick = () => {
+            dt.value = originalTags;
             updateTags();
             sendDisplayUpdate();
         }
@@ -394,6 +405,9 @@ let onPageLoad = () => {
     // Image Change
     observeProperty(ii, "innerText", () => {
         onImageChange();
+
+        // Save original tags
+        originalTags = dti.value;
 
         // Auto interrogate // TODO Improve
         if(ai.checked)
