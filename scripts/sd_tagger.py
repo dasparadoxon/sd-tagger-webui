@@ -119,7 +119,7 @@ def on_ui_tabs():
             if not os.path.isfile(path):
                 return gr.update(visible=True), f"Error: Invalid Tags Path", None
             with open(path, 'r') as f:
-                tags = list(dict.fromkeys([line.rstrip().replace('"', '') for line in f]))
+                tags = ",".join(list(dict.fromkeys([line.rstrip() for line in f])))
             config["tags_path"] = path
             save_config()
             return gr.update(visible=True), f"Successfully imported {len(tags)} tags from {path}", tags
