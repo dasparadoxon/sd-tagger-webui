@@ -232,8 +232,6 @@ let onPageLoad = () => {
                 if (tagButton.classList.contains("gr-button-primary")) {
                     tagButton.classList.remove("gr-button-primary");
                     if(dt.value) {
-                        // TODO Write a function for sanitizing the tag box
-                        // Make removing empty tags optional.
                         let split = dt.value.split(",").map((s) => {
                             return s.trim();
                         });
@@ -253,6 +251,12 @@ let onPageLoad = () => {
             tgli.appendChild(tagButton);
             tagCount++;
         }
+
+        let hidden = tags.length - mtc.value
+        if(tags.length > 0)
+            talo.innerText = tags.length + " Tags Loaded" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
+        else
+            talo.innerText = "No Tags";
     }
 
     // Update the tag states (e.g. when switching images)
@@ -268,12 +272,22 @@ let onPageLoad = () => {
             return;
 
         for(let i = 0; i < buttons.length; i++) {
-            if(split.includes(buttons[i].innerText)) {
+            let occurrence = split.reduce((n, str) => {
+                return n + (str === buttons[i].innerText);
+            }, 0);
+
+            if(occurrence > 0) {
                 if (!buttons[i].classList.contains("gr-button-primary")) {
                     buttons[i].classList.add("gr-button-primary");
                 }
             } else {
                 buttons[i].classList.remove("gr-button-primary");
+            }
+
+            if(occurrence > 1 && hld.checked) {
+                buttons[i].style.color = "red";
+            } else {
+                buttons[i].style.color = "";
             }
         }
     }
@@ -309,6 +323,7 @@ let onPageLoad = () => {
     let cc = gradioApp().querySelector("#setting_cropper_snap input");
     let ai = gradioApp().querySelector("#setting_auto_interrogate input");
     let mtc = gradioApp().querySelector("#setting_max_tag_count input");
+    let hld = gradioApp().querySelector("#setting_highlight_duplicate input");
 
     let ib = gradioApp().querySelector("#interrogate_button");
 
@@ -319,10 +334,10 @@ let onPageLoad = () => {
     let ii = gradioApp().querySelector("#image_index #image_index");
 
     let rt = gradioApp().querySelector("#reload_tags");
-
     let ct = gradioApp().querySelector("#clear_tags");
-
     let rvt = gradioApp().querySelector("#revert_tags");
+
+    let talo = gradioApp().querySelector("#tags_loaded");
 
     // Clear tags button
     if(ct) {
@@ -397,7 +412,7 @@ let onPageLoad = () => {
         sendDisplayUpdate();
     };
 
-    // ...
+    // When the invisible tags box is changed
     observeProperty(dti, "value", () => {
         updateDisplayTags();
         updateTags();
