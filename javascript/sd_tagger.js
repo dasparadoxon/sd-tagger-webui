@@ -256,7 +256,7 @@ let onPageLoad = () => {
         if(tags.length > 0)
             talo.innerText = tags.length + " Tags Loaded" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
         else
-            talo.innerText = "No Tags";
+            talo.innerText = "No Tags Loaded";
     }
 
     // Update the tag states (e.g. when switching images)
@@ -339,6 +339,8 @@ let onPageLoad = () => {
 
     let talo = gradioApp().querySelector("#tags_loaded");
 
+    let reda = gradioApp().querySelector("#reload_dataset_tags_button");
+
     // Clear tags button
     if(ct) {
         ct.onclick = () => {
@@ -390,6 +392,7 @@ let onPageLoad = () => {
     }, 250);
 
     rt.onclick = () => {
+        reda.click();
         reloadTags();
         updateTags();
     };

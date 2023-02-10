@@ -61,7 +61,7 @@ class Tagger:
 
 def load_dataset(path: str):
     files = recursive_dir(path, [".png", ".jpg", ".jpeg", "webp"])
-    files = sort(files)
+    files = sort_alphanumeric(files)
     dataset = []
     for f in files:
         dataset.append(DatasetImage(f))
@@ -97,7 +97,7 @@ def write_tagfile(tagfile: str, tags: list):
 
 
 # Sort Alphanumerically
-def sort(l: list):
+def sort_alphanumeric(l: list):
     convert = lambda text: int(text) if text.isdigit() else text
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
     return sorted(l, key=alphanum_key)

@@ -7,8 +7,7 @@ import tempfile
 import shutil
 import re
 from PIL import Image
-from scripts.helpers.tagger import Tagger
-from scripts.helpers.tagger import load_dataset_tags
+from scripts.helpers.tagger import Tagger, load_dataset_tags, sort_alphanumeric
 from scripts.helpers.interrogate import DeepDanbooru
 from modules import script_callbacks, sd_models
 from modules.shared import opts, OptionInfo
@@ -18,6 +17,7 @@ deep = DeepDanbooru()
 
 # Globals
 tagger = None
+dataset_tags = None
 config = {
     "dataset_path": "",
     "tags_path": ""
@@ -102,6 +102,9 @@ def on_ui_tabs():
         crop_data = gr.Text(elem_id="crop_data", visible=False)
         crop_button = gr.Button(elem_id="crop_button", visible=False)
 
+        # Reload Dataset Tags
+        reload_dataset_tags_button = gr.Button(elem_id="reload_dataset_tags_button", visible=False);
+
         # Component actions
         def save_tags_click(text):
             if tagger:
@@ -132,7 +135,7 @@ def on_ui_tabs():
             save_config()
 
             if tags_radio == "Dataset Tags":
-                return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, ",".join(list(load_dataset_tags(tagger.dataset).keys()))
+                return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, reload_dataset_tags_click()
             else:
                 return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, tags_data
 
@@ -203,9 +206,21 @@ def on_ui_tabs():
         def tags_radio_update(value, tags_data):
             if value == "Dataset Tags":
                 if tagger:
-                    return ",".join(list(load_dataset_tags(tagger.dataset).keys())), gr.update(visible=False), gr.update(visible=False)
+                    return reload_dataset_tags_click(), gr.update(visible=False), gr.update(visible=False)
             elif value == "File":
                 return tags_data, gr.update(visible=True), gr.update(visible=True)
+
+        def reload_dataset_tags_click():
+            return ",".join(reload_dataset_tags())
+
+        def reload_dataset_tags():
+            global dataset_tags
+            dataset_tags = load_dataset_tags(tagger.dataset)
+            if opts.tag_sort == "Alphanumeric":
+                dataset_tags = sort_alphanumeric(dataset_tags.keys())
+            elif opts.tag_sort == "Rank":
+                dataset_tags = reversed(sorted(dataset_tags, key=lambda i: int(dataset_tags[i])))
+            return dataset_tags
 
         # Events
         crop_button.click(fn=crop_click, inputs=[display, crop_data, display_tags])
@@ -219,6 +234,7 @@ def on_ui_tabs():
         display.change(fn=display_update, inputs=[display], outputs=[display_tags, log_count, display_index])
         display_index.change(fn=index_update, inputs=[display_tags, display_index], outputs=[display])
         tags_radio.change(fn=tags_radio_update, inputs=[tags_radio, tags_data], outputs=[tags_data, load_tags_button, tags_textbox])
+        reload_dataset_tags_button.click(fn=reload_dataset_tags_click, outputs=[tags_data])
 
     return (sd_tagger, "SD Tagger", "sd_tagger"),
 
@@ -226,7 +242,8 @@ def on_ui_tabs():
 def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
     opts.add_option("max_tag_count", OptionInfo(75, "Maximum number of tags to display", section=section))
-    opts.add_option("cropper_snap", OptionInfo(64, "Cropper grid snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
+    opts.add_option("tag_sort", OptionInfo("Rank", "Tag Sorting", gr.Radio, {"choices": ["Alphanumeric", "Rank"]}, section=section))
+    opts.add_option("cropper_snap", OptionInfo(64, "Cropper Grid Snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
     opts.add_option("cropper_copy_tags", OptionInfo(True, "Clone tags from the source image to cropped image", section=section))
     opts.add_option("display_change_save_tags", OptionInfo(True, "Automatically save tags on scroll", section=section))
     opts.add_option("auto_interrogate", OptionInfo(False, "Automatically interrogate on scroll", section=section))
@@ -234,7 +251,6 @@ def on_ui_settings():
     opts.add_option("print_interrogate", OptionInfo(False, "Log when interrogating", section=section))
     opts.add_option("highlight_duplicate", OptionInfo(True, "Highlight duplicate tags", section=section))
     #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=
-    #opts.add_option("tag_sort", OptionInfo("Alphanumeric", "By Count", gr.Radio, {"choices": ["Alphanumeric", "By Count"]}, section=section))
 
 script_callbacks.on_ui_settings(on_ui_settings)
 script_callbacks.on_ui_tabs(on_ui_tabs)
