@@ -207,14 +207,22 @@ let onPageLoad = () => {
 
     // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
     let reloadTags = () => {
+        // If no tags found
         if(!td.value)
             return;
 
-        ts.value = ""; // Reset Search
         tgli.innerHTML = ""; // Remove Buttons
 
         let tags = td.value.split(",");
+        let tagCount = 0;
+
         for (let i = 0; i < tags.length; i++) {
+            // Maximum tag count
+            if(tagCount > mtc.value)
+                break;
+            if(!tags[i].toLowerCase().startsWith(ts.value.toLowerCase()))
+                continue;
+
             let tagButton = tb.cloneNode(true);
             tagButton.id = "";
             tagButton.innerText = tags[i];
@@ -241,6 +249,7 @@ let onPageLoad = () => {
             };
             tagButton.classList.remove("d-none");
             tgli.appendChild(tagButton);
+            tagCount++;
         }
     }
 
@@ -296,8 +305,8 @@ let onPageLoad = () => {
     let dh = gradioApp().querySelector("#display_html");
 
     let cc = gradioApp().querySelector("#setting_cropper_snap input");
-
     let ai = gradioApp().querySelector("#setting_auto_interrogate input");
+    let mtc = gradioApp().querySelector("#setting_max_tag_count input");
 
     let ib = gradioApp().querySelector("#interrogate_button");
 
@@ -351,18 +360,12 @@ let onPageLoad = () => {
         }
     }, 250);
 
-    /// TODO Replace these with event calling
-    observeProperty(ts, "value", (text) => {
-        let buttons = tgli.childNodes;
-        for(let i = 0; i < buttons.length; i++) {
-            if(buttons[i].innerText.toLowerCase().startsWith(text)) {
-                buttons[i].style.display = "";
-            } else {
-                buttons[i].style.display = "none";
-            }
-        }
-    }, 250);
+    ts.oninput = () => {
+        reloadTags();
+        updateTags();
+    }
 
+    /// TODO Replace these with event calling
     // When tag data get updated (invisible element)
     observeProperty(td, "value", () => {
         reloadTags();
@@ -385,7 +388,7 @@ let onPageLoad = () => {
     observeProperty(ii, "innerText", () => {
         onImageChange();
 
-        // Auto interrogate
+        // Auto interrogate // TODO Improve
         if(ai.checked)
             ib.click()
     }, 250);
