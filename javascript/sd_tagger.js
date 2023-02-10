@@ -316,6 +316,8 @@ let onPageLoad = () => {
 
     let ii = gradioApp().querySelector("#image_index #image_index");
 
+    let rt = gradioApp().querySelector("#reload_tags");
+
     // Clear tags button
     if(ct) {
         ct.onclick = () => {
@@ -360,10 +362,15 @@ let onPageLoad = () => {
         }
     }, 250);
 
+    rt.onclick = () => {
+        reloadTags();
+        updateTags();
+    };
+
     ts.oninput = () => {
         reloadTags();
         updateTags();
-    }
+    };
 
     /// TODO Replace these with event calling
     // When tag data get updated (invisible element)

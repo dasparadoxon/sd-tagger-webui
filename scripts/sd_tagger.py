@@ -221,7 +221,7 @@ def on_ui_tabs():
 
 def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
-    opts.add_option("max_tag_count", OptionInfo(75, "Maximum number of tag to display", section=section))
+    opts.add_option("max_tag_count", OptionInfo(75, "Maximum number of tags to display", section=section))
     opts.add_option("cropper_snap", OptionInfo(64, "Cropper grid snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
     opts.add_option("cropper_copy_tags", OptionInfo(True, "Clone tags from the source image to cropped image", section=section))
     opts.add_option("display_change_save_tags", OptionInfo(True, "Automatically save tags on scroll", section=section))
