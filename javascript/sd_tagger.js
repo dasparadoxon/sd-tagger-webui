@@ -208,11 +208,12 @@ let onPageLoad = () => {
 
     // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
     let reloadTags = () => {
+
+        tgli.innerHTML = ""; // Remove Buttons
+
         // If no tags found
         if(!td.value)
             return;
-
-        tgli.innerHTML = ""; // Remove Buttons
 
         let tags = td.value.split(",");
         let tagCount = 0;
