@@ -73,7 +73,7 @@ def on_ui_tabs():
                     tags_textbox = gr.Text(value=config["tags_path"], label="Path to Tags")
                     load_tags_button = gr.Button(value="Load Tags", variant="secondary")
                 with gr.Row(variant="panel"):
-                    interrogate_button = gr.Button(value="Interrogate", variant="secondary")
+                    interrogate_button = gr.Button(elem_id="interrogate_button", value="Interrogate", variant="secondary")
                     interrogate_append_method = gr.Radio(value="Replace", choices=["Replace", "Before", "After"], label="Append Options", interactive=True)
                     interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Threshold", interactive=True)
                 with gr.Row():
@@ -216,6 +216,7 @@ def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
     opts.add_option("cropper_snap", OptionInfo(64, "Cropper grid snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
     opts.add_option("display_change_save_tags", OptionInfo(True, "Automatically save tags on scroll", section=section))
+    opts.add_option("auto_interrogate", OptionInfo(False, "Automatically interrogate on scroll", section=section))
     opts.add_option("print_save_tags", OptionInfo(False, "Log when tags are saved", section=section))
     opts.add_option("print_interrogate", OptionInfo(False, "Log when interrogating", section=section))
     #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=section))

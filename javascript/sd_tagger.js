@@ -297,6 +297,10 @@ let onPageLoad = () => {
 
     let cc = gradioApp().querySelector("#setting_cropper_snap input");
 
+    let ai = gradioApp().querySelector("#setting_auto_interrogate input");
+
+    let ib = gradioApp().querySelector("#interrogate_button");
+
     let dti = gradioApp().querySelector("#display_tags_internal textarea");
 
     let ct = gradioApp().querySelector("#clear_tags");
@@ -359,27 +363,35 @@ let onPageLoad = () => {
         }
     }, 250);
 
+    // When tags get updated
     observeProperty(td, "value", () => {
         reloadTags();
         updateTags();
     }, 1000);
 
+    // When tags are being typed
     dt.oninput = () => {
         updateTags();
         sendDisplayUpdate();
     };
 
+    // ...
     observeProperty(dti, "value", () => {
         updateDisplayTags();
     }, 250);
 
+    // Image Change
     observeProperty(ii, "innerText", () => {
         onImageChange();
+
+        // Auto interrogate
+        if(ai.checked)
+            ib.click()
     }, 250);
 }
 
 
-/// TODO Messy
+/// TODO Everything is messy.
 let interval = setInterval(() => {
     let tg = gradioApp().querySelector("#tag_list");
     if(tg) {
