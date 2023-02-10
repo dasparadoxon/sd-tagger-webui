@@ -4,12 +4,19 @@ from modules import devices, shared
 from modules import deepbooru as db
 from modules import images as imgtool
 
+
 class DeepDanbooru():
+
+    def __init__(self):
+        self.on = False
+
     def start(self):
         db.model.start()
+        self.on = True
 
     def stop(self):
         db.model.stop()
+        self.on = False
 
     def predict(self, pil_image, threshold):
 

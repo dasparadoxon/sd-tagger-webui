@@ -15,7 +15,6 @@ from modules.shared import opts, OptionInfo
 
 
 deep = DeepDanbooru()
-deep.start()
 
 # Globals
 tagger = None
@@ -77,6 +76,8 @@ def on_ui_tabs():
                     interrogate_button = gr.Button(value="Interrogate", variant="secondary")
                     interrogate_append_method = gr.Radio(value="Replace", choices=["Replace", "Before", "After"], label="Append Options", interactive=True)
                     interrogate_threshold = gr.Slider(value=0.6, minimum=0.0, maximum=1.0, label="Threshold", interactive=True)
+                with gr.Row():
+                    interrogate_off_button = gr.Button(value="Interrogate Off", variant="secondary", visible=False)
             # Right Side
             with gr.Column():
                 gr.HTML(elem_id="display_html", value=display_html)
@@ -161,10 +162,18 @@ def on_ui_tabs():
             except Exception as err:
                 print("Error while cropping: ", err)
 
+        def interrogate_off_click():
+            deep.stop()
+            print("Stopped Interrogator.")
+            return gr.update(visible=False)
+
         def interrogate_click(image, image_tags, append_method, threshold):
             if image is None:
                 print("Interrogate failed. No images loaded.")
                 return image_tags
+            if not deep.on:
+                print("Starting Interrogator...")
+                deep.start()
 
             predict_tags = deep.predict(image, threshold).keys()
             if bool(opts.print_interrogate):
@@ -172,14 +181,14 @@ def on_ui_tabs():
             predict_tags = ", ".join(predict_tags)
 
             if len(image_tags) == 0:
-                return predict_tags
+                return predict_tags, gr.update(visible=True)
 
             if append_method == "Replace":
-                return predict_tags
+                return predict_tags, gr.update(visible=True)
             elif append_method == "Before":
-                return predict_tags + ", " + image_tags
+                return predict_tags + ", " + image_tags, gr.update(visible=True)
             elif append_method == "After":
-                return image_tags + ", " + predict_tags
+                return image_tags + ", " + predict_tags, gr.update(visible=True)
 
         def tags_radio_update(value, tags_data):
             if value == "Dataset Tags":
@@ -189,7 +198,8 @@ def on_ui_tabs():
 
         # Events
         crop_button.click(fn=crop_click, inputs=[display, crop_data])
-        interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags])
+        interrogate_off_button.click(fn=interrogate_off_click, outputs=[interrogate_off_button])
+        interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags, interrogate_off_button])
         save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
         load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, tags_data])
         process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display, display_index])
