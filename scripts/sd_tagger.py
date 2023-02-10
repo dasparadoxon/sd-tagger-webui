@@ -82,7 +82,8 @@ def on_ui_tabs():
                 gr.HTML(elem_id="display_html", value=display_html)
                 display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image", type="pil")
                 with gr.Row():
-                    log_count = gr.HTML(elem_id="image_index", value="")
+                    with gr.Row(variant="panel"):
+                        log_count = gr.HTML(elem_id="image_index", value="")
                     display_index = gr.Slider(label="Dataset Index", interactive=True)
                 with gr.Row():
                     previous_button = gr.Button(value="Previous", variant="secondary")
@@ -137,8 +138,9 @@ def on_ui_tabs():
         def next_click(index):
             return gr.update(value=index + 1)
 
-        def display_update():
-            return ", ".join(tagger.current().tags), f"{tagger.index + 1} / {tagger.num_files}", gr.update(value=tagger.index + 1, minimum=1, maximum=tagger.num_files)
+        def display_update(image):
+            w, h = image.size
+            return ", ".join(tagger.current().tags), f"{tagger.index + 1} / {tagger.num_files} {tagger.current().path} ({w}x{h})", gr.update(value=tagger.index + 1, minimum=1, maximum=tagger.num_files)
 
         def index_update(image_tags, index):
             save_tags_click(image_tags)
@@ -151,7 +153,7 @@ def on_ui_tabs():
             rect = json.loads(crop_json)
             rect = (rect["x1"], rect["y1"], rect["x2"], rect["y2"])
             try:
-                crop_image = Image.fromarray(image).crop(rect)
+                crop_image = image.crop(rect)
                 w, h = crop_image.size
                 crop_name = str(tagger.index) + "-(" + str(w) + "x" + str(h) + ")-" + str(random.randint(0, 100000)) + ".png"
                 crop_image.save("extensions/sd-tagger-webui/crops/" + crop_name)
@@ -193,7 +195,7 @@ def on_ui_tabs():
         process_button.click(fn=process_click, inputs=[dataset_textbox], outputs=[log_row, log_output, display, display_index])
         previous_button.click(fn=previous_click, inputs=[display_index], outputs=[display_index])
         next_button.click(fn=next_click, inputs=[display_index], outputs=[display_index])
-        display.change(fn=display_update, outputs=[display_tags, log_count, display_index])
+        display.change(fn=display_update, inputs=[display], outputs=[display_tags, log_count, display_index])
         display_index.change(fn=index_update, inputs=[display_tags, display_index], outputs=[display])
         tags_radio.change(fn=tags_radio_update, inputs=[tags_radio, tags_data], outputs=[tags_data, load_tags_button, tags_textbox])
 

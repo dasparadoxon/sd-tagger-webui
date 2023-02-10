@@ -11,6 +11,8 @@
     display: none;
     position: absolute;
     border: 2px solid red;
+    color: red;
+    font-size: 28px;
     z-index: 999;
 }
 

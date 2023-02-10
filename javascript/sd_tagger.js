@@ -114,13 +114,16 @@ let onPageLoad = () => {
 
         if(ti.pressed) {
             // Calculate relative image coordinates for rectangle
-            let x = ti.press_x - bound.x;
-            let y = ti.press_y - bound.y
+            let x = ti.press_x - bound.x - pageXOffset;
+            let y = ti.press_y - bound.y - pageYOffset;
             let width = Math.abs(mouseX - ti.press_x);
             let height = Math.abs(mouseY - ti.press_y);
 
+            // How much the image is zoomed in
+            let zoomRatio = ti.naturalWidth / bound.width;
+
             // Snapping
-            let snap = cc.value;
+            let snap = cc.value * (1 / zoomRatio);
 
             width = Math.round(width / snap) * snap;
             height = Math.round(height / snap) * snap;
@@ -160,14 +163,20 @@ let onPageLoad = () => {
             rect.style.width = width + "px";
             rect.style.height = height + "px";
 
-            // Multiply the size difference between the real image and the display.
-            let sizeRatio = ti.naturalWidth / bound.width;
+            // Update image size text
+            if(width > 0 && height > 0) {
+                rect.style.padding = "5px";
+                rect.innerText = Math.ceil(width * zoomRatio) + "x" + Math.ceil(height * zoomRatio);
+            } else {
+                rect.style.padding = "0px";
+                rect.innerText = "";
+            }
 
             crop = {
-                x1: Math.floor(x * sizeRatio),
-                y1: Math.floor(y * sizeRatio),
-                x2: Math.floor((x + width) * sizeRatio),
-                y2: Math.floor((y + height) * sizeRatio)
+                x1: Math.floor(x * zoomRatio),
+                y1: Math.floor(y * zoomRatio),
+                x2: Math.floor((x + width) * zoomRatio),
+                y2: Math.floor((y + height) * zoomRatio)
             };
         }
     }
