@@ -231,7 +231,7 @@ let onPageLoad = () => {
             tagButton.onmousedown = (e) => {
                 if(e.button === 1) {
                     if(vw.checked) {
-                        window.open("https://danbooru.donmai.us/wiki_pages/" + tagButton.innerText.replace(" ", "_"), '_blank');
+                        window.open("https://danbooru.donmai.us/wiki_pages/" + tagButton.innerText.replaceAll(" ", "_"), '_blank');
                         return false;
                     }
                 }
