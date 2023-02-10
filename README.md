@@ -46,7 +46,7 @@ the /crops/ folder. By default, it snaps to a 64 pixel grid, you can change this
 
 ### Interrogate
 
-You can interrogate an image using DeepDanbooru by clicking the interrogate button.
+Interrogate an image using DeepDanbooru by setting a threshold clicking the interrogate button. You can also toggle auto-interrogation in the settings.
 
 ![Screenshot of interrogate](resources/showcase/screenshot-3.png)
 
