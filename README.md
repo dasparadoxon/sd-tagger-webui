@@ -2,7 +2,7 @@
 
 This is a small extension for AUTOMATIC's webui. It adds a tab for tagging images from a dataset.
 
-![Screenshot of user interface](resources/showcase/screenshot.png)
+![Screenshot of user interface](resources/showcase/screenshot-1.png)
 
 ## Getting Started
 

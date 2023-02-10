@@ -119,10 +119,11 @@ def on_ui_tabs():
             if not os.path.isfile(path):
                 return gr.update(visible=True), f"Error: Invalid Tags Path", None
             with open(path, 'r') as f:
-                tags = ",".join(list(dict.fromkeys([line.rstrip() for line in f])))
+                list_tags = list(dict.fromkeys([line.rstrip() for line in f]))
+                tags = ",".join(list_tags)
             config["tags_path"] = path
             save_config()
-            return gr.update(visible=True), f"Successfully imported {len(tags)} tags from {path}", tags
+            return gr.update(visible=True), f"Successfully imported {len(list_tags)} tags from {path}", tags
 
         def process_click(path):
             if not os.path.isdir(path):
@@ -159,8 +160,9 @@ def on_ui_tabs():
                 crop_name = str(tagger.index) + "-(" + str(w) + "x" + str(h) + ")-" + str(random.randint(0, 100000))
                 crop_image.save("extensions/sd-tagger-webui/crops/" + crop_name + ".png")
                 if bool(opts.cropper_copy_tags):
-                    with open("extensions/sd-tagger-webui/crops/" + crop_name + ".txt", 'w') as f:
-                        f.write(image_tags)
+                    if image_tags:
+                        with open("extensions/sd-tagger-webui/crops/" + crop_name + ".txt", 'w') as f:
+                            f.write(image_tags)
                     print("Cropped", tagger.index, crop_json, "Saved To:", crop_name + ".png", "+ Tags")
                 else:
                     print("Cropped", tagger.index, crop_json, "Saved To:", crop_name + ".png")
