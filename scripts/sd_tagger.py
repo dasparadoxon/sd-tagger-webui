@@ -227,7 +227,8 @@ def on_ui_settings():
     opts.add_option("auto_interrogate", OptionInfo(False, "Automatically interrogate on scroll", section=section))
     opts.add_option("print_save_tags", OptionInfo(False, "Log when tags are saved", section=section))
     opts.add_option("print_interrogate", OptionInfo(False, "Log when interrogating", section=section))
-    #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=section))
+    #opts.add_option("cropper_mode", OptionInfo("Drag", "Cropper Mode", gr.Radio, {"choices": ["Drag", "Brush"]}, section=
+    #opts.add_option("tag_sort", OptionInfo("Alphanumeric", "By Count", gr.Radio, {"choices": ["Alphanumeric", "By Count"]}, section=section))
 
 script_callbacks.on_ui_settings(on_ui_settings)
 script_callbacks.on_ui_tabs(on_ui_tabs)
