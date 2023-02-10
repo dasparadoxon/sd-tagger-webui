@@ -363,7 +363,7 @@ let onPageLoad = () => {
         }
     }, 250);
 
-    // When tags get updated
+    // When tag data get updated (invisible element)
     observeProperty(td, "value", () => {
         reloadTags();
         updateTags();
@@ -378,6 +378,7 @@ let onPageLoad = () => {
     // ...
     observeProperty(dti, "value", () => {
         updateDisplayTags();
+        updateTags();
     }, 250);
 
     // Image Change
