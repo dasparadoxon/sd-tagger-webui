@@ -213,7 +213,7 @@ let onPageLoad = () => {
         ts.value = ""; // Reset Search
         tgli.innerHTML = ""; // Remove Buttons
 
-        let tags = JSON.parse(td.value.replaceAll("\'", "\""));
+        let tags = td.value.split(",");
         for (let i = 0; i < tags.length; i++) {
             let tagButton = tb.cloneNode(true);
             tagButton.id = "";

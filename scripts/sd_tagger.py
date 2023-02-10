@@ -197,7 +197,7 @@ def on_ui_tabs():
 
         def tags_radio_update(value, tags_data):
             if value == "Dataset Tags":
-                return [tag.replace('"', '') for tag in list(load_dataset_tags(tagger.dataset).keys())], gr.update(visible=False), gr.update(visible=False)
+                return ",".join(list(load_dataset_tags(tagger.dataset).keys())), gr.update(visible=False), gr.update(visible=False)
             elif value == "File":
                 return tags_data, gr.update(visible=True), gr.update(visible=True)
 
