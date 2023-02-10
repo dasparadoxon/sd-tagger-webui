@@ -105,14 +105,13 @@ def on_ui_tabs():
         # Component actions
         def save_tags_click(text):
             if tagger:
-                if bool(opts.display_change_save_tags):
-                    if text:
-                        tagger.current().tags = [x.strip() for x in text.split(',')]
-                    else:
-                        tagger.current().tags = []
-                    tagger.current().save()
-                    if bool(opts.print_save_tags):
-                        print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
+                if text:
+                    tagger.current().tags = [x.strip() for x in text.split(',')]
+                else:
+                    tagger.current().tags = []
+                tagger.current().save()
+                if bool(opts.print_save_tags):
+                    print("Saved ", tagger.index, "::", tagger.current().tagfile, tagger.current().tags)
 
         def load_tags_click(path):
             if not os.path.isfile(path):
@@ -148,7 +147,8 @@ def on_ui_tabs():
             return ", ".join(tagger.current().tags), f"{tagger.index + 1} / {tagger.num_files} {tagger.current().path} ({w}x{h})", gr.update(value=tagger.index + 1, minimum=1, maximum=tagger.num_files)
 
         def index_update(image_tags, index):
-            save_tags_click(image_tags)
+            if bool(opts.display_change_save_tags):
+                save_tags_click(image_tags)
             tagger.set_index(index - 1)
             return tagger.current().path
 
