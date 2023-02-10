@@ -19,7 +19,7 @@ It **does not** support captions in the filename.
 
 For tagging you can provide either a separate tags file with each tag on a new line or use the tags present in your dataset.
 
-![Screenshot of cropping](resources/showcase/screenshot-4.png)
+![Screenshot of tagging](resources/showcase/screenshot-4.png)
 
 The format for a tags file is as follows
 
