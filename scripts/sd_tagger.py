@@ -148,7 +148,7 @@ def on_ui_tabs():
             tagger.set_index(index - 1)
             return tagger.current().path
 
-        def crop_click(image, crop_json):
+        def crop_click(image, crop_json, image_tags):
             if not os.path.isdir("extensions/sd-tagger-webui/crops"):
                 os.mkdir("extensions/sd-tagger-webui/crops")
             rect = json.loads(crop_json)
@@ -156,9 +156,14 @@ def on_ui_tabs():
             try:
                 crop_image = image.crop(rect)
                 w, h = crop_image.size
-                crop_name = str(tagger.index) + "-(" + str(w) + "x" + str(h) + ")-" + str(random.randint(0, 100000)) + ".png"
-                crop_image.save("extensions/sd-tagger-webui/crops/" + crop_name)
-                print("Cropped", tagger.index, crop_json, "Saved To:", crop_name)
+                crop_name = str(tagger.index) + "-(" + str(w) + "x" + str(h) + ")-" + str(random.randint(0, 100000))
+                crop_image.save("extensions/sd-tagger-webui/crops/" + crop_name + ".png")
+                if bool(opts.cropper_copy_tags):
+                    with open("extensions/sd-tagger-webui/crops/" + crop_name + ".txt", 'w') as f:
+                        f.write(image_tags)
+                    print("Cropped", tagger.index, crop_json, "Saved To:", crop_name + ".png", "+ Tags")
+                else:
+                    print("Cropped", tagger.index, crop_json, "Saved To:", crop_name + ".png")
             except Exception as err:
                 print("Error while cropping: ", err)
 
@@ -197,7 +202,7 @@ def on_ui_tabs():
                 return tags_data, gr.update(visible=True), gr.update(visible=True)
 
         # Events
-        crop_button.click(fn=crop_click, inputs=[display, crop_data])
+        crop_button.click(fn=crop_click, inputs=[display, crop_data, display_tags])
         interrogate_off_button.click(fn=interrogate_off_click, outputs=[interrogate_off_button])
         interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags, interrogate_off_button])
         save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
@@ -215,6 +220,7 @@ def on_ui_tabs():
 def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
     opts.add_option("cropper_snap", OptionInfo(64, "Cropper grid snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
+    opts.add_option("cropper_copy_tags", OptionInfo(True, "Clone tags from the source image to cropped image", section=section))
     opts.add_option("display_change_save_tags", OptionInfo(True, "Automatically save tags on scroll", section=section))
     opts.add_option("auto_interrogate", OptionInfo(False, "Automatically interrogate on scroll", section=section))
     opts.add_option("print_save_tags", OptionInfo(False, "Log when tags are saved", section=section))
