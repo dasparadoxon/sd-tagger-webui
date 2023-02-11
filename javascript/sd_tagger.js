@@ -230,7 +230,7 @@ let onPageLoad = () => {
             tagButton.innerText = tags[i];
             tagButton.onmousedown = (e) => {
                 if(e.button === 1) {
-                    if(vw.checked) {
+                    if(openWikiSetting.checked) {
                         window.open("https://danbooru.donmai.us/wiki_pages/" + tagButton.innerText.replaceAll(" ", "_"), '_blank');
                         return false;
                     }
@@ -264,7 +264,7 @@ let onPageLoad = () => {
         if(tags.length > 0)
             talo.innerText = tags.length + " Tags Loaded" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
         else
-            talo.innerText = "No Tags Loaded";
+            tagsListLog.innerText = "No Tags Loaded";
     }
 
     // Update the tag states (e.g. when switching images)
@@ -328,32 +328,33 @@ let onPageLoad = () => {
     let cb = gradioApp().querySelector("#crop_button");
     let dh = gradioApp().querySelector("#display_html");
 
-    let cc = gradioApp().querySelector("#setting_cropper_snap input");
-    let ai = gradioApp().querySelector("#setting_auto_interrogate input");
-    let mtc = gradioApp().querySelector("#setting_max_tag_count input");
-    let hld = gradioApp().querySelector("#setting_highlight_duplicate input");
-    let vw = gradioApp().querySelector("#setting_open_tag_wiki input");
+    let setupTagsList = () => {
 
-    let ib = gradioApp().querySelector("#interrogate_button");
+        tagsListSearch.oninput = () => {
+            reloadTags();
+            updateTags();
+        };
 
-    let dti = gradioApp().querySelector("#display_tags_internal textarea");
+        tagsListPreviousPageBtn.onclick = () => {
 
+        };
 
+        tagsListNextPageBtn.onclick = () => {
 
-    let ii = gradioApp().querySelector("#image_index #image_index");
+        };
 
-    let rt = gradioApp().querySelector("#reload_tags");
-    let ct = gradioApp().querySelector("#clear_tags");
-    let rvt = gradioApp().querySelector("#revert_tags");
+        tagsListPageIndex.oninput = (e) => {
 
-    let talo = gradioApp().querySelector("#tags_loaded");
+        };
 
-    let reda = gradioApp().querySelector("#reload_dataset_tags_button");
+        reloadTagsListBtn.onclick = () => {
+            reloadTagsListGradioBtn.click();
+            reloadTags();
+            updateTags();
+        };
 
-    // Clear tags button
-    if(ct) {
-        ct.onclick = () => {
-            dt.value = "";
+        clearTagsBtn.onclick = () => {
+            displayTags.value = "";
             updateTags();
             sendDisplayUpdate();
         }
@@ -400,11 +401,10 @@ let onPageLoad = () => {
         }
     }, 250);
 
-    rt.onclick = () => {
-        reda.click();
-        reloadTags();
-        updateTags();
-    };
+    setupDisplay();
+    setupDisplayResizeBtn()
+    setupCropper();
+    setupTagsList();
 
     ts.oninput = () => {
         reloadTags();

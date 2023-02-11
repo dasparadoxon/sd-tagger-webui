@@ -101,9 +101,7 @@ def on_ui_tabs():
         # Cropping
         crop_data = gr.Text(elem_id="crop_data", visible=False)
         crop_button = gr.Button(elem_id="crop_button", visible=False)
-
-        # Reload Dataset Tags
-        reload_dataset_tags_button = gr.Button(elem_id="reload_dataset_tags_button", visible=False);
+        reload_tags_list_button = gr.Button(elem_id="reload_tags_list_button", visible=False);
 
         # Component actions
         def save_tags_click(text):
@@ -231,10 +229,10 @@ def on_ui_tabs():
         process_button.click(fn=process_click, inputs=[dataset_textbox, tags_radio, tags_data], outputs=[log_row, log_output, display, display_index, tags_data])
         previous_button.click(fn=previous_click, inputs=[display_index], outputs=[display_index])
         next_button.click(fn=next_click, inputs=[display_index], outputs=[display_index])
-        display.change(fn=display_update, inputs=[display], outputs=[display_tags, log_count, display_index])
-        display_index.change(fn=index_update, inputs=[display_tags, display_index], outputs=[display])
-        tags_radio.change(fn=tags_radio_update, inputs=[tags_radio, tags_data], outputs=[tags_data, load_tags_button, tags_textbox])
-        reload_dataset_tags_button.click(fn=reload_dataset_tags_click, outputs=[tags_data])
+        display.change(fn=display_update, inputs=[display], outputs=[draft_tags, display_log, display_index])
+        display_index.change(fn=index_update, inputs=[draft_tags, display_index], outputs=[display])
+        tags_radio.change(fn=tags_radio_update, inputs=[tags_radio, available_tags], outputs=[available_tags, load_tags_button, tags_textbox])
+        reload_tags_list_button.click(fn=reload_dataset_tags_click, outputs=[available_tags])
 
     return (sd_tagger, "SD Tagger", "sd_tagger"),
 
