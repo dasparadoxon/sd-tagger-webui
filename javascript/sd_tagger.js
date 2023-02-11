@@ -459,6 +459,7 @@ let onPageLoad = () => {
     setupDisplayResizeBtn()
     setupCropper();
     setupTagsList();
+    updateDisplayTags();
 
     // When tag data get updated (invisible element)
     observeProperty(availableTags, "value", () => {
