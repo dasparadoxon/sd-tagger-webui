@@ -54,6 +54,5 @@ Interrogate an image using DeepDanbooru by setting a threshold clicking the inte
 
 - Faster loading
 - More interrogators
-- Tag pagination
 - Cropping modes (Brush)
 - ...

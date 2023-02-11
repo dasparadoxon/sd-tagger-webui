@@ -48,6 +48,10 @@
 
 /********************************/
 
+#tab_sd_tagger button[disabled] {
+    background-color: black;
+}
+
 .no-interact {
     -webkit-user-select: none;
     -webkit-user-drag: none;

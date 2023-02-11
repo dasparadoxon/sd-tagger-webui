@@ -66,6 +66,8 @@ let onPageLoad = () => {
     let shiftKey = false;
     let lastX, lastY;
     let originalTags;
+    let tagsPage = 0;
+    let numTagsPages = 0;
 
     let setupDisplayResizeBtn = () => {
         let displayBounds = display.getBoundingClientRect();
@@ -257,14 +259,37 @@ let onPageLoad = () => {
             return;
 
         let tags = availableTags.value.split(",");
+
+        // Prune tags based on search
+        tags = tags.filter((t) => t.toLowerCase().includes(tagsListSearch.value.toLowerCase()))
+
+        // Number of tag pages
+        numTagsPages = Math.floor(tags.length / maxTagsSetting.value) + 1;
+
+        if(numTagsPages > 1) {
+            if(tagsPage === 0) {
+                tagsListPreviousPageBtn.disabled = true;
+                tagsListNextPageBtn.disabled = false;
+            } else if(tagsPage >= numTagsPages - 1) {
+                tagsListPreviousPageBtn.disabled = false;
+                tagsListNextPageBtn.disabled = true;
+            } else {
+                tagsListPreviousPageBtn.disabled = false;
+                tagsListNextPageBtn.disabled = false;
+            }
+            tagsListPageIndex.disabled = false;
+        } else {
+            tagsListPreviousPageBtn.disabled = true;
+            tagsListNextPageBtn.disabled = true;
+            tagsListPageIndex.disabled = true;
+        }
+
         let tagCount = 0;
 
-        for (let i = 0; i < tags.length; i++) {
+        for (let i = tagsPage * maxTagsSetting.value; i < tags.length; i++) {
             // Maximum tag count
             if(tagCount > maxTagsSetting.value)
                 break;
-            if(!tags[i].toLowerCase().startsWith(tagsListSearch.value.toLowerCase()))
-                continue;
 
             let tagButton = tagTemplate.cloneNode(true);
             tagButton.id = "";
@@ -303,7 +328,7 @@ let onPageLoad = () => {
 
         let hidden = tags.length - maxTagsSetting.value
         if(tags.length > 0)
-            tagsListLog.innerText = tags.length + " Tags Loaded" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
+            tagsListLog.innerText = (tagsPage + 1) + "/" + numTagsPages + " Pages " + tags.length + " Tags" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
         else
             tagsListLog.innerText = "No Tags Loaded";
     }
@@ -356,21 +381,40 @@ let onPageLoad = () => {
 
     let setupTagsList = () => {
 
-        tagsListSearch.oninput = () => {
-            reloadTags();
-            updateTags();
+        let verifyPageReload = () => {
+            if(tagsPage < 0)
+                tagsPage = 0;
+            if(tagsPage >= numTagsPages)
+                tagsPage = numTagsPages - 1;
+
+            tagsListPageIndex.value = tagsPage + 1;
+            reloadTags()
         };
 
         tagsListPreviousPageBtn.onclick = () => {
-
+            tagsPage--;
+            verifyPageReload();
         };
 
         tagsListNextPageBtn.onclick = () => {
-
+            tagsPage++;
+            verifyPageReload();
         };
 
+        let pageIndexDelay;
         tagsListPageIndex.oninput = (e) => {
+            let num = parseInt(tagsListPageIndex.value);
+            if(Number.isInteger(num)) {
+                tagsPage = num - 1;
+                verifyPageReload();
+            }
+        };
 
+        tagsListSearch.oninput = (e) => {
+            tagsPage = 0;
+            tagsListPageIndex.value = "";
+            reloadTags();
+            updateTags();
         };
 
         reloadTagsListBtn.onclick = () => {
