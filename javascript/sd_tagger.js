@@ -389,6 +389,7 @@ let onPageLoad = () => {
 
             tagsListPageIndex.value = tagsPage + 1;
             reloadTags()
+            updateTags();
         };
 
         tagsListPreviousPageBtn.onclick = () => {
