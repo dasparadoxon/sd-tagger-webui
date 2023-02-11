@@ -360,8 +360,10 @@ let onPageLoad = () => {
 
             if(occurrence > 1 && highlightDupesSetting.checked) {
                 buttons[i].style.color = "red";
+                buttons[i].style.backgroundColor = "red";
             } else {
                 buttons[i].style.color = "";
+                buttons[i].style.backgroundColor = "";
             }
         }
     }
