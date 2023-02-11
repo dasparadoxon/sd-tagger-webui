@@ -17,73 +17,107 @@ let observeProperty = (obj, property, callback, time = 250, compare) => {
 
 let onPageLoad = () => {
 
+    // Load all the elements we'll need
+
+    // Internal Gradio Elements (Invisible)
+    // These will be used to transfer data back to gradio
+    // TODO Looking for other solutions rather than using invisible gradio elements
+    let availableTags = gradioApp().querySelector("#available_tags textarea");
+    let draftTags = gradioApp().querySelector("#draft_tags textarea");
+    let cropData = gradioApp().querySelector("#crop_data textarea");
+    let cropBtn = gradioApp().querySelector("#crop_button");
+    let reloadTagsListGradioBtn = gradioApp().querySelector("#reload_tags_list_button");
+
+    // Display
+    let display = gradioApp().querySelector("#display");
+    let displayHTML = gradioApp().querySelector("#display_html");
+    let cropper = gradioApp().querySelector("#cropper");
+    let image;
+    let resizeDisplayBtn = gradioApp().querySelector("#resize_display");
+    let displayLog = gradioApp().querySelector("#display_log");
+
+    // Display Tags
+    let displayTags = gradioApp().querySelector("#display_tags textarea");
+
+    // Tags List
+    let tagsList = gradioApp().querySelector("#tags_list");
+    let tagTemplate = gradioApp().querySelector("#tag_template");
+    let tagsListSearch = gradioApp().querySelector("#tags_list_search");
+    let tagsListPreviousPageBtn = gradioApp().querySelector("#tags_list_previous_page");
+    let tagsListNextPageBtn = gradioApp().querySelector("#tags_list_next_page");
+    let tagsListPageIndex = gradioApp().querySelector("#tags_list_page_index");
+    let reloadTagsListBtn = gradioApp().querySelector("#reload_tags_list");
+    let clearTagsBtn = gradioApp().querySelector("#clear_tags");
+    let revertTagsBtn = gradioApp().querySelector("#revert_tags");
+    let tagsListLog = gradioApp().querySelector("#tags_list_log");
+
+    // Misc
+    let interrogateBtn = gradioApp().querySelector("#interrogate_button");
+
+    // Settings
+    let cropperSnapSetting = gradioApp().querySelector("#setting_cropper_snap input");
+    let autoInterrogateSetting = gradioApp().querySelector("#setting_auto_interrogate input");
+    let maxTagsSetting = gradioApp().querySelector("#setting_max_tag_count input");
+    let highlightDupesSetting = gradioApp().querySelector("#setting_highlight_duplicate input");
+    let openWikiSetting = gradioApp().querySelector("#setting_open_tag_wiki input");
+
+    // Internal Variables
     let crop = {};
     let shiftKey = false;
     let lastX, lastY;
     let originalTags;
 
-    let initResizer = () => {
-        let resizeButton = gradioApp().querySelector("#resize_display");
-        let display = gradioApp().querySelector("#display");
-        let bound = display.getBoundingClientRect();
+    let setupDisplayResizeBtn = () => {
+        let displayBounds = display.getBoundingClientRect();
 
         let drag = false;
         let downY = 0;
 
         document.addEventListener("mousemove", (e) => {
             if(drag) {
-                display.style.height = (e.pageY - bound.y + 10) + "px";
+                display.style.height = (e.pageY - displayBounds.y + 10) + "px";
             }
         });
 
-        resizeButton.onmousedown = (e) => {
+        resizeDisplayBtn.onmousedown = (e) => {
             drag = true;
             downY = e.pageY;
-        }
+        };
 
-        document.addEventListener("mouseup", (e) => {drag = false;});
+        document.addEventListener("mouseup", (e) => {
+            drag = false;
+        });
     }
 
-    let initCropper = () => {
+    let setupCropper = () => {
         let cancelContext = false;
 
         let cancel = () => {
-            ti.pressed = false;
-            ti.press_x = undefined;
-            ti.press_y = undefined;
-        }
+            image.pressed = false;
+            image.press_x = undefined;
+            image.press_y = undefined;
+        };
 
-        let mousemove = (e) => {
+        document.addEventListener("mousemove", (e) => {
             cropperUpdate(e.pageX, e.pageY);
             lastX = e.pageX;
             lastY = e.pageY;
-            //e.preventDefault();
-        }
+        });
 
-        let mousedown = (e) => {
-            ti.pressed = true;
-            ti.press_x = e.pageX;
-            ti.press_y = e.pageY;
-            //e.preventDefault();
-        }
-
-        let mouseup = (e) => {
+        document.addEventListener("mouseup", (e) => {
             if(e.button === 0) {
-                if(ti.pressed) {
+                if(image.pressed) {
                     // Send for Crop
-                    cd.value = JSON.stringify(crop);
-                    cd.dispatchEvent(new CustomEvent("input", {}));
-                    cb.click();
+                    cropData.value = JSON.stringify(crop);
+                    cropData.dispatchEvent(new CustomEvent("input", {}));
+                    cropBtn.click();
                 }
                 cancel();
             }
-            //e.preventDefault();
-        }
+        });
 
-        document.addEventListener("mousemove", mousemove);
-        document.addEventListener("mouseup", mouseup);
         document.addEventListener("mousedown", (e) => {
-            if(e.button === 2 && ti.pressed) {
+            if(e.button === 2 && image.pressed) {
                 cancel();
                 cancelContext = true;
             }
@@ -111,38 +145,45 @@ let onPageLoad = () => {
             }
         });
 
-        let croppingRect = gradioApp().querySelector("#cropping_rect");
+        image.onmouseenter = (e) => {
+            image.hovering = true;
+        };
 
-        // Connect to display image
-        ti.onmouseenter = (e) => {ti.hovering = true;}
-        ti.onmouseleave = (e) => {ti.hovering = false;}
-        ti.onmousedown = mousedown;
+        image.onmouseleave = (e) => {
+            image.hovering = false;
+        };
+
+        let tiMouseDown = (e) => {
+            image.pressed = true;
+            image.press_x = e.pageX;
+            image.press_y = e.pageY;
+        };
+
+        image.onmousedown = (e) => tiMouseDown(e);
 
         // Edge case: include cropping rectangle with mousedown
-        croppingRect.onmousedown = mousedown;
+        cropper.onmousedown = (e) => tiMouseDown(e);
 
     }
 
     let cropperUpdate = (mouseX, mouseY) => {
-        // TODO Improve naming
-        let bound = gradioApp().querySelector("#display img").getBoundingClientRect();
-        let rect = gradioApp().querySelector("#cropping_rect");
+        let bound = image.getBoundingClientRect();
 
-        rect.style.display = ti.pressed ? "block" : "none";
+        cropper.style.display = image.pressed ? "block" : "none";
         //croppingRect.style.display = ti.hovering ? "block" : "none"; // Another mode
 
-        if(ti.pressed) {
+        if(image.pressed) {
             // Calculate relative image coordinates for rectangle
-            let x = ti.press_x - bound.x - pageXOffset;
-            let y = ti.press_y - bound.y - pageYOffset;
-            let width = Math.abs(mouseX - ti.press_x);
-            let height = Math.abs(mouseY - ti.press_y);
+            let x = image.press_x - bound.x - pageXOffset;
+            let y = image.press_y - bound.y - pageYOffset;
+            let width = Math.abs(mouseX - image.press_x);
+            let height = Math.abs(mouseY - image.press_y);
 
             // How much the image is zoomed in
-            let zoomRatio = ti.naturalWidth / bound.width;
+            let zoomRatio = image.naturalWidth / bound.width;
 
             // Snapping
-            let snap = cc.value * (1 / zoomRatio);
+            let snap = cropperSnapSetting.value * (1 / zoomRatio);
 
             width = Math.round(width / snap) * snap;
             height = Math.round(height / snap) * snap;
@@ -183,18 +224,18 @@ let onPageLoad = () => {
                 height = height - (endY - bound.height)
 
             // Update visual
-            rect.style.left = x + "px";
-            rect.style.top = y + "px";
-            rect.style.width = width + "px";
-            rect.style.height = height + "px";
+            cropper.style.left = x + "px";
+            cropper.style.top = y + "px";
+            cropper.style.width = width + "px";
+            cropper.style.height = height + "px";
 
             // Update image size text
             if(width > 0 && height > 0) {
-                rect.style.padding = "5px";
-                rect.innerText = Math.ceil(width * zoomRatio) + "x" + Math.ceil(height * zoomRatio);
+                cropper.style.padding = "5px";
+                cropper.innerText = Math.ceil(width * zoomRatio) + "x" + Math.ceil(height * zoomRatio);
             } else {
-                rect.style.padding = "0px";
-                rect.innerText = "";
+                cropper.style.padding = "0px";
+                cropper.innerText = "";
             }
 
             crop = {
@@ -209,23 +250,23 @@ let onPageLoad = () => {
     // Reload the tags from the gradio tag data (e.g. tags were loaded from txt file)
     let reloadTags = () => {
 
-        tgli.innerHTML = ""; // Remove Buttons
+        tagsList.innerHTML = ""; // Remove Buttons
 
         // If no tags found
-        if(!td.value)
+        if(!availableTags.value)
             return;
 
-        let tags = td.value.split(",");
+        let tags = availableTags.value.split(",");
         let tagCount = 0;
 
         for (let i = 0; i < tags.length; i++) {
             // Maximum tag count
-            if(tagCount > mtc.value)
+            if(tagCount > maxTagsSetting.value)
                 break;
-            if(!tags[i].toLowerCase().startsWith(ts.value.toLowerCase()))
+            if(!tags[i].toLowerCase().startsWith(tagsListSearch.value.toLowerCase()))
                 continue;
 
-            let tagButton = tb.cloneNode(true);
+            let tagButton = tagTemplate.cloneNode(true);
             tagButton.id = "";
             tagButton.innerText = tags[i];
             tagButton.onmousedown = (e) => {
@@ -239,41 +280,41 @@ let onPageLoad = () => {
             tagButton.onclick = (e) => {
                 if (tagButton.classList.contains("gr-button-primary")) {
                     tagButton.classList.remove("gr-button-primary");
-                    if(dt.value) {
-                        let split = dt.value.split(",").map((s) => {
+                    if(displayTags.value) {
+                        let split = displayTags.value.split(",").map((s) => {
                             return s.trim();
                         });
-                        dt.value = split.filter(tag => tag !== tagButton.innerText).join(", ");
+                        displayTags.value = split.filter(tag => tag !== tagButton.innerText).join(", ");
                     }
                 } else {
                     tagButton.classList.add("gr-button-primary");
-                    if(dt.value) {
-                        dt.value = dt.value + ", " + tagButton.innerText;
+                    if(displayTags.value) {
+                        displayTags.value = displayTags.value + ", " + tagButton.innerText;
                     } else {
-                        dt.value = tagButton.innerText;
+                        displayTags.value = tagButton.innerText;
                     }
                 }
-                dt.dispatchEvent(new CustomEvent("input", {}));
+                displayTags.dispatchEvent(new CustomEvent("input", {}));
             };
             tagButton.classList.remove("d-none");
-            tgli.appendChild(tagButton);
+            tagsList.appendChild(tagButton);
             tagCount++;
         }
 
-        let hidden = tags.length - mtc.value
+        let hidden = tags.length - maxTagsSetting.value
         if(tags.length > 0)
-            talo.innerText = tags.length + " Tags Loaded" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
+            tagsListLog.innerText = tags.length + " Tags Loaded" + ((hidden > 0) ? " (" + hidden + " hidden)" : "");
         else
             tagsListLog.innerText = "No Tags Loaded";
     }
 
     // Update the tag states (e.g. when switching images)
     let updateTags = () => {
-        let split = dt.value.split(",").map((s) => {
+        let split = displayTags.value.split(",").map((s) => {
             return s.trim();
         });
 
-        let buttons = tgli.getElementsByTagName("button");
+        let buttons = tagsList.getElementsByTagName("button");
 
         // Return if buttons not loaded
         if(buttons.length === 0)
@@ -292,7 +333,7 @@ let onPageLoad = () => {
                 buttons[i].classList.remove("gr-button-primary");
             }
 
-            if(occurrence > 1 && hld.checked) {
+            if(occurrence > 1 && highlightDupesSetting.checked) {
                 buttons[i].style.color = "red";
             } else {
                 buttons[i].style.color = "";
@@ -301,32 +342,17 @@ let onPageLoad = () => {
     }
 
     let updateDisplayTags = () => {
-        dt.value = dti.value;
-    };
+        displayTags.value = draftTags.value;
+    }
 
     let sendDisplayUpdate = () => {
-        dti.value = dt.value;
-        dti.dispatchEvent(new CustomEvent("input", {}));
-    };
+        draftTags.value = displayTags.value;
+        draftTags.dispatchEvent(new CustomEvent("input", {}));
+    }
 
     let onImageChange = () => {
         updateTags();
-    };
-
-    /// TODO Proper Naming
-    let tg = gradioApp().querySelector("#tag_list");
-    let tgli = gradioApp().querySelector("#tag_list_inner");
-    let tb = gradioApp().querySelector("#example_tag");
-    let td = gradioApp().querySelector("#tags_data textarea");
-    let dt = gradioApp().querySelector("#display_tags textarea");
-    let st = gradioApp().querySelector("#save_tags");
-    let ts = gradioApp().querySelector("#tag_search");
-    let tic = gradioApp().querySelector("#tagging_image");
-    let ti = gradioApp().querySelector("#tagging_image img");
-    let dd = gradioApp().querySelector("#display_data img");
-    let cd = gradioApp().querySelector("#crop_data textarea");
-    let cb = gradioApp().querySelector("#crop_button");
-    let dh = gradioApp().querySelector("#display_html");
+    }
 
     let setupTagsList = () => {
 
@@ -357,97 +383,73 @@ let onPageLoad = () => {
             displayTags.value = "";
             updateTags();
             sendDisplayUpdate();
-        }
+        };
 
-        rvt.onclick = () => {
-            dt.value = originalTags;
+        revertTagsBtn.onclick = () => {
+            displayTags.value = originalTags;
             updateTags();
             sendDisplayUpdate();
-        }
+        };
     }
 
-    // Hide display-box
-    dh.style.display = "none";
+    let setupDisplay = () => {
+        let move = gradioApp().querySelector("#display_image_to_move");
+        let di = gradioApp().querySelector("#display_image_to_move img");
+        let display_inner = gradioApp().querySelector("#display div");
 
-    let postImageLoad = setInterval(() => {
-        ti = gradioApp().querySelector("#tagging_image img");
-        if(ti) {
-            let display_inner = gradioApp().querySelector("#display div");
-            let display = gradioApp().querySelector("#display");
-            let old_html = gradioApp().querySelector("#tagging_image");
+        display_inner.appendChild(di);
 
-            old_html.style.position = "absolute";
-            old_html.style.top = "100%";
-            old_html.style.border = "none";
+        image = gradioApp().querySelector("#display img");
 
-            display_inner.appendChild(ti);
-            display.appendChild(old_html);
+        displayHTML.style.display = "block";
 
-            // Make display-box visible
-            dh.style.display = "block";
-
-            // Format Tagging Image
-            ti.classList.remove("w-full");
-            ti.classList.add("h-full");
-            ti.classList.add("tagging-img");
-
-            // Activate Display Resize Button
-            initResizer();
-
-            // Activate Image Cropper
-            initCropper();
-
-            clearInterval(postImageLoad);
-        }
-    }, 250);
+        image.classList.remove("w-full");
+        image.classList.add("h-full");
+        image.classList.add("no-interact");
+    }
 
     setupDisplay();
     setupDisplayResizeBtn()
     setupCropper();
     setupTagsList();
 
-    ts.oninput = () => {
-        reloadTags();
-        updateTags();
-    };
-
-    /// TODO Replace these with event calling
     // When tag data get updated (invisible element)
-    observeProperty(td, "value", () => {
+    observeProperty(availableTags, "value", () => {
         reloadTags();
         updateTags();
     }, 1000);
 
     // When tags are being typed
-    dt.oninput = () => {
+    displayTags.oninput = () => {
         updateTags();
         sendDisplayUpdate();
     };
 
     // When the invisible tags box is changed
-    observeProperty(dti, "value", () => {
+    observeProperty(draftTags, "value", () => {
         updateDisplayTags();
         updateTags();
     }, 250);
 
     // Image Change
-    observeProperty(ii, "innerText", () => {
+    observeProperty(displayLog, "innerText", () => {
         onImageChange();
 
         // Save original tags
-        originalTags = dti.value;
+        originalTags = displayTags.value;
 
-        // Auto interrogate // TODO Improve
-        if(ai.checked)
-            ib.click()
+        if(autoInterrogateSetting.checked)
+            interrogateBtn.click()
     }, 250);
 }
 
-
-/// TODO Everything is messy.
 let interval = setInterval(() => {
-    let tg = gradioApp().querySelector("#tag_list");
-    if(tg) {
+    let di = gradioApp().querySelector("#display_image_to_move img")
+
+    // Hide the display box until we can move the image into it.
+    gradioApp().querySelector("#display_html").style.display = "none";
+
+    if(di) {
         onPageLoad();
         clearInterval(interval);
     }

@@ -1,0 +1,36 @@
+<div class="gr-padded rounded-[22px] border border-solid border-gray-200 flex flex-col gap-3">
+    <label for="tags_list_search" class="pl-1">
+        Available Tags
+    </label>
+    <div>
+        <input id="tags_list_search" type="search" class="gr-input gr-box rounded" placeholder="Search tags..." />
+    </div>
+    <div class="gr-block gr-box relative w-full overflow-hidden border-solid border border-gray-200">
+        <div id="tags_list" class="flex flex-row flex-wrap gap-2 gr-padded">
+        </div>
+        <div class="flex flex-row gap-2 justify-center gr-padded">
+            <button id="tags_list_previous_page" class="gr-button gr-button-secondary p-5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                </svg>
+            </button>
+            <input id="tags_list_page_index" type="search" class="gr-input gr-box rounded" placeholder="0" />
+            <button id="tags_list_next_page" class="gr-button gr-button-secondary p-5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                </svg>
+            </button>
+        </div>
+        <hr>
+        <div class="flex flex-row gap-2 justify-between gr-padded">
+            <div id="tags_list_log" class="my-a">No Tags Loaded</div>
+            <button id="reload_tags_list" class="gr-button gr-button-secondary p-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="20" height="20" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <button id="tag_template" class="gr-button d-none" type="button">Test Button</button>
+</div>

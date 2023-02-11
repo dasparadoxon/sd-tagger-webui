@@ -1,13 +1,4 @@
-.draggable {
-    cursor: move;
-    user-select: none;
-}
-
-.d-none {
-    display: none;
-}
-
-#cropping_rect {
+#cropper {
     display: none;
     position: absolute;
     border: 2px solid red;
@@ -15,17 +6,6 @@
     font-size: 28px;
     z-index: 999;
     user-select: none;
-}
-
-#crop_outer {
-    position: relative;
-    width: 0;
-    height: 0;
-}
-
-.tagging-img {
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
 }
 
 #resize_display {
@@ -41,39 +21,60 @@
     cursor: ns-resize;
 }
 
-.max-h-full {
-    max-height: 100%;
-}
-
 #display_tags_label {
     top: -0.6em;
     left: 1em;
 }
 
-#reload_tags {
-    padding: 5px;
-}
-
-#tags_button_group {
+#display_tags_buttons {
     position: absolute;
     bottom: 5px;
     right: 5px;
+}
+
+#tags_list_log {
+    font-size: 14px;
+}
+
+#tags_list_page_index {
+    width: 75px;
+    height: 32px;
+}
+
+.display_tags_button {
+    width: 1.75em;
+    height: 1.75em;
+}
+
+/********************************/
+
+.no-interact {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
 }
 
 .pl-1 {
     padding-left: 0.25rem;
 }
 
-.tag_button {
-    width: 1.75em;
-    height: 1.75em;
-}
-
-#tags_loaded {
-    font-size: 14px;
-}
-
 .my-a {
     margin-top: auto;
     margin-bottom: auto;
+}
+
+.p-5 {
+    padding: 5px;
+}
+
+.draggable {
+    cursor: move;
+    user-select: none;
+}
+
+.d-none {
+    display: none;
+}
+
+.max-h-full {
+    max-height: 100%;
 }

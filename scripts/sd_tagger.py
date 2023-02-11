@@ -26,13 +26,13 @@ config = {
 config_file = "extensions/sd-tagger-webui/config.json"
 
 # TODO Improve
-tag_list_file = "extensions/sd-tagger-webui/html/tag_list.html"
+tags_list_file = "extensions/sd-tagger-webui/html/tags_list.html"
 display_file = "extensions/sd-tagger-webui/html/display.html"
 display_tags_file = "extensions/sd-tagger-webui/html/display_tags.html"
 
 # Import HTML
-with open(tag_list_file, "r") as f:
-    tag_list_html = f.read()
+with open(tags_list_file, "r") as f:
+    tags_list_html = f.read()
 with open(display_file, "r") as f:
     display_html = f.read()
 with open(display_tags_file, "r") as f:
@@ -66,7 +66,7 @@ def on_ui_tabs():
                 gr.HTML(value=display_tags_html)
                 with gr.Row(variant="panel"):
                     with gr.Column():
-                        gr.HTML(elem_id="tag_list", value=tag_list_html)
+                        gr.HTML(value=tags_list_html)
                 with gr.Row(variant="panel"):
                     tags_radio = gr.Radio(value="", choices=["Dataset Tags", "File"], label="Tag Set", interactive=True)
                 with gr.Row(variant="panel"):
@@ -81,10 +81,10 @@ def on_ui_tabs():
             # Right Side
             with gr.Column():
                 gr.HTML(elem_id="display_html", value=display_html)
-                display = gr.Image(interactive=False, show_label=False, elem_id="tagging_image", type="pil")
+                display = gr.Image(interactive=False, show_label=False, elem_id="display_image_to_move", type="pil")
                 with gr.Row():
                     with gr.Row(variant="panel"):
-                        log_count = gr.HTML(elem_id="image_index", value="")
+                        display_log = gr.HTML(elem_id="display_log", value="")
                     display_index = gr.Slider(label="Dataset Index", interactive=True)
                 with gr.Row():
                     previous_button = gr.Button(value="Previous", variant="secondary")
@@ -92,13 +92,14 @@ def on_ui_tabs():
                 with gr.Row():
                     save_tags_button = gr.Button(value="Save Tags", elem_id="save_tags")
 
-        # Section used to transfer data between js and gradio
-        display_tags = gr.Text(elem_id="display_tags_internal", visible=False)
+        # Hidden Elements #
 
-        # General user loaded tags.
-        tags_data = gr.Text(elem_id="tags_data", visible=False)
+        # The tags that the user is currently editing.
+        draft_tags = gr.Text(elem_id="draft_tags", visible=False)
 
-        # Cropping
+        # Tags that are loaded by using existing dataset tags or loading them by file.
+        available_tags = gr.Text(elem_id="available_tags", visible=False)
+
         crop_data = gr.Text(elem_id="crop_data", visible=False)
         crop_button = gr.Button(elem_id="crop_button", visible=False)
         reload_tags_list_button = gr.Button(elem_id="reload_tags_list_button", visible=False);
@@ -124,7 +125,7 @@ def on_ui_tabs():
             save_config()
             return gr.update(visible=True), f"Successfully imported {len(list_tags)} tags from {path}", tags
 
-        def process_click(path, tags_radio, tags_data):
+        def process_click(path, tags_radio, loaded_tags):
             if not os.path.isdir(path):
                 return gr.update(visible=True), f"Error: Invalid Dataset Path", None
             global tagger
@@ -135,7 +136,7 @@ def on_ui_tabs():
             if tags_radio == "Dataset Tags":
                 return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, reload_dataset_tags_click()
             else:
-                return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, tags_data
+                return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, loaded_tags
 
         def previous_click(index):
             return gr.update(value=index - 1)
@@ -201,12 +202,12 @@ def on_ui_tabs():
             elif append_method == "After":
                 return image_tags + ", " + predict_tags, gr.update(visible=True)
 
-        def tags_radio_update(value, tags_data):
+        def tags_radio_update(value, loaded_tags):
             if value == "Dataset Tags":
                 if tagger:
                     return reload_dataset_tags_click(), gr.update(visible=False), gr.update(visible=False)
             elif value == "File":
-                return tags_data, gr.update(visible=True), gr.update(visible=True)
+                return loaded_tags, gr.update(visible=True), gr.update(visible=True)
 
         def reload_dataset_tags_click():
             return ",".join(reload_dataset_tags())
@@ -221,12 +222,12 @@ def on_ui_tabs():
             return dataset_tags
 
         # Events
-        crop_button.click(fn=crop_click, inputs=[display, crop_data, display_tags])
+        crop_button.click(fn=crop_click, inputs=[display, crop_data, draft_tags])
         interrogate_off_button.click(fn=interrogate_off_click, outputs=[interrogate_off_button])
-        interrogate_button.click(fn=interrogate_click, inputs=[display, display_tags, interrogate_append_method, interrogate_threshold], outputs=[display_tags, interrogate_off_button])
-        save_tags_button.click(fn=save_tags_click, inputs=[display_tags])
-        load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, tags_data])
-        process_button.click(fn=process_click, inputs=[dataset_textbox, tags_radio, tags_data], outputs=[log_row, log_output, display, display_index, tags_data])
+        interrogate_button.click(fn=interrogate_click, inputs=[display, draft_tags, interrogate_append_method, interrogate_threshold], outputs=[draft_tags, interrogate_off_button])
+        save_tags_button.click(fn=save_tags_click, inputs=[draft_tags])
+        load_tags_button.click(fn=load_tags_click, inputs=[tags_textbox], outputs=[log_row, log_output, available_tags])
+        process_button.click(fn=process_click, inputs=[dataset_textbox, tags_radio, available_tags], outputs=[log_row, log_output, display, display_index, available_tags])
         previous_button.click(fn=previous_click, inputs=[display_index], outputs=[display_index])
         next_button.click(fn=next_click, inputs=[display_index], outputs=[display_index])
         display.change(fn=display_update, inputs=[display], outputs=[draft_tags, display_log, display_index])
