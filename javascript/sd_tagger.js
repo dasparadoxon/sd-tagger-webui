@@ -288,7 +288,7 @@ let onPageLoad = () => {
 
         for (let i = tagsPage * maxTagsSetting.value; i < tags.length; i++) {
             // Maximum tag count
-            if(tagCount > maxTagsSetting.value)
+            if(tagCount >= maxTagsSetting.value)
                 break;
 
             let tagButton = tagTemplate.cloneNode(true);
