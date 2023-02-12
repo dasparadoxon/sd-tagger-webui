@@ -414,14 +414,16 @@ let onPageLoad = () => {
         };
 
         tagsListSearch.oninput = (e) => {
-            tagsPage = 0;
             tagsListPageIndex.value = "";
+            tagsPage = 0;
             reloadTags();
             updateTags();
         };
 
         reloadTagsListBtn.onclick = () => {
             reloadTagsListGradioBtn.click();
+            tagsListPageIndex.value = "";
+            tagsPage = 0;
             reloadTags();
             updateTags();
         };
