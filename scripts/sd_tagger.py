@@ -121,6 +121,8 @@ def on_ui_tabs():
             with open(path, 'r') as f:
                 list_tags = list(dict.fromkeys([line.rstrip() for line in f]))
                 tags = ",".join(list_tags)
+                global dataset_tags
+                dataset_tags = list_tags
             config["tags_path"] = path
             save_config()
             return gr.update(visible=True), f"Successfully imported {len(list_tags)} tags from {path}", tags
@@ -134,7 +136,7 @@ def on_ui_tabs():
             save_config()
 
             if tags_radio == "Dataset Tags":
-                return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, reload_dataset_tags_click(), ", ".join(tagger.current().tags)
+                return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, reload_tags_list_click(), ", ".join(tagger.current().tags)
             else:
                 return gr.update(visible=True), f"Successfully got {tagger.num_files} images from {path}", tagger.current().path, 1, loaded_tags, ", ".join(tagger.current().tags)
 
@@ -205,20 +207,23 @@ def on_ui_tabs():
         def tags_radio_update(value, loaded_tags):
             if value == "Dataset Tags":
                 if tagger:
-                    return reload_dataset_tags_click(), gr.update(visible=False), gr.update(visible=False)
+                    return reload_tags_list_click(), gr.update(visible=False), gr.update(visible=False)
             elif value == "File":
                 return loaded_tags, gr.update(visible=True), gr.update(visible=True)
 
-        def reload_dataset_tags_click():
-            return ",".join(reload_dataset_tags())
+        def reload_tags_list_click(dataset_type="Dataset Tags", path=None):
+            return ",".join(reload_available_tags(dataset_type, path))
 
-        def reload_dataset_tags():
+        def reload_available_tags(dataset_type="Dataset Tags", path=None):
             global dataset_tags
-            dataset_tags = load_dataset_tags(tagger.dataset)
-            if opts.tag_sort == "Alphanumeric":
-                dataset_tags = sort_alphanumeric(dataset_tags.keys())
-            elif opts.tag_sort == "Rank":
-                dataset_tags = reversed(sorted(dataset_tags, key=lambda i: int(dataset_tags[i])))
+            if dataset_type == "Dataset Tags":
+                dataset_tags = load_dataset_tags(tagger.dataset)
+                if opts.tag_sort == "Alphanumeric":
+                    dataset_tags = sort_alphanumeric(dataset_tags.keys())
+                elif opts.tag_sort == "Rank":
+                    dataset_tags = reversed(sorted(dataset_tags, key=lambda i: int(dataset_tags[i])))
+            elif dataset_type == "File":
+                load_tags_click(path)
             return dataset_tags
 
         # Events
@@ -233,7 +238,7 @@ def on_ui_tabs():
         display.change(fn=display_update, inputs=[display], outputs=[draft_tags, display_log, display_index])
         display_index.change(fn=index_update, inputs=[draft_tags, display_index], outputs=[display])
         tags_radio.change(fn=tags_radio_update, inputs=[tags_radio, available_tags], outputs=[available_tags, load_tags_button, tags_textbox])
-        reload_tags_list_button.click(fn=reload_dataset_tags_click, outputs=[available_tags])
+        reload_tags_list_button.click(fn=reload_tags_list_click, inputs=[tags_radio, tags_textbox], outputs=[available_tags])
 
     return (sd_tagger, "SD Tagger", "sd_tagger"),
 
@@ -241,7 +246,7 @@ def on_ui_tabs():
 def on_ui_settings():
     section = ('sd-tagger', "SD Tagger")
     opts.add_option("max_tag_count", OptionInfo(75, "Maximum number of tags to display", section=section))
-    opts.add_option("tag_sort", OptionInfo("Rank", "Tag Sorting", gr.Radio, {"choices": ["Alphanumeric", "Rank"]}, section=section))
+    opts.add_option("tag_sort", OptionInfo("Rank", "Tag Sorting (Dataset Tags)", gr.Radio, {"choices": ["Alphanumeric", "Rank"]}, section=section))
     opts.add_option("cropper_snap", OptionInfo(64, "Cropper Grid Snap", gr.Slider, {"minimum": 2, "maximum": 128, "step": 2}, section=section))
     opts.add_option("cropper_copy_tags", OptionInfo(True, "Clone tags from the source image to cropped image", section=section))
     opts.add_option("display_change_save_tags", OptionInfo(True, "Automatically save tags on scroll", section=section))
