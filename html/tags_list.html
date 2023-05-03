@@ -1,14 +1,17 @@
 <div class="gr-padded rounded-[22px] border border-solid border-gray-200 flex flex-col gap-3">
     <label for="tags_list_search" class="pl-1">
-        Available Tags
+        Search in available Tags
     </label>
-    <div>
-        <input id="tags_list_search" type="search" class="gr-input gr-box rounded" placeholder="Search tags..." />
+    <div style="margin-bottom: 2%;">
+        <!-- <textarea id="tags_list_search" type="search" data-testid="textbox" class="scroll-hide svelte-1pie7s6" placeholder="" rows="1" style="overflow-y: scroll; height: 42px;"></textarea>-->
+        <input id="tags_list_search" type="search" class="gr-input dark gr-box rounded" placeholder="Search tags..." 
+        style=" border-radius: 2%; color: black;" />
     </div>
+    
     <div class="gr-block gr-box relative w-full overflow-hidden border-solid border border-gray-200">
         <div id="tags_list" class="flex flex-row flex-wrap gap-2 gr-padded">
         </div>
-        <div class="flex flex-row gap-2 justify-center gr-padded">
+        <div class="flex flex-row gap-2 justify-center gr-padded" style="margin-top: 2%;">
             <button id="tags_list_previous_page" class="gr-button gr-button-secondary p-5" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
